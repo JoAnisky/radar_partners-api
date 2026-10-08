@@ -1,0 +1,38 @@
+services:
+    radarpartners-api:
+        build:
+            context: .
+            dockerfile: .docker/Dockerfile
+            target: ${APP_ENV:-dev}
+        container_name: radarpartners-api
+        environment:
+            APP_ENV: ${APP_ENV:-dev}
+            APP_DEBUG: ${APP_DEBUG:-1}
+            DATABASE_URL: postgresql://radar:radar@radarpartners-db:5432/radar?serverVersion=17&charset=utf8
+        volumes:
+            - "./:/var/www/html"
+        depends_on:
+            - radarpartners-db
+        networks:
+            - web
+            - default
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.radarpartners-api.rule=Host(`${DOMAIN:-localhost}`)"
+
+    radarpartners-db:
+        image: postgres:17-alpine
+        container_name: radarpartners-db
+        environment:
+            POSTGRES_USER: radar
+            POSTGRES_PASSWORD: radar
+            POSTGRES_DB: radar
+        volumes:
+            - radarpartners_db_data:/var/lib/postgresql/data
+
+volumes:
+    radarpartners_db_data:
+
+networks:
+    web:
+        external: true
