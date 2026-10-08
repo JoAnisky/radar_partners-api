@@ -29,10 +29,15 @@ services:
             POSTGRES_DB: radar
         volumes:
             - radarpartners_db_data:/var/lib/postgresql/data
+        networks:
+            - default
+            - pgsql_network
 
 volumes:
     radarpartners_db_data:
 
 networks:
     web:
+        external: true
+    pgsql_network:
         external: true
