@@ -28,4 +28,4 @@ Dernière mise à jour : 2026-10-08
 - Outils PHPStan, PHP-CS-Fixer, ESLint : installés (API) ou à installer (front), pas encore configurés.
 - Identifiants PostgreSQL de dev en clair (`radar`/`radar`) : à sortir avant la prod.
 - CORS (`nelmio/cors-bundle`) à prévoir quand le navigateur appellera l'API.
-- Interface PostgreSQL : Adminer partagé (`../../adminer-pgsql`), `http://adminer.dev.local`, à lancer avant `make up` (réseau `pgsql_network`).
+- Interface PostgreSQL : Adminer partagé (`../../adminer-pgsql`), `http://adminer.dev.local` ; réseau externe `pgsql_network` à créer une fois (`docker network create pgsql_network`).
