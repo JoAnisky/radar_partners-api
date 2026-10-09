@@ -50,6 +50,7 @@ Le modèle découle des limites du tableur de prospection actuel, où une même 
 ### `Company`
 - `siren` (nullable, unique) : clé de rapprochement avec l'API Recherche d'entreprises
 - `name`, `website`, `address`, `postalCode`, `city`
+- `phone` (standard, normalisé E.164, nullable), `email` (générique, nullable)
 - `nafCode`, `headcountRange`
 - `type` : enum `CompanyType` → `ESN`, `WEB_AGENCY`, `COM_AGENCY`, `END_CLIENT`, `UNKNOWN`
 - `scope` : enum `Scope` → `LOCAL`, `NATIONAL`
@@ -60,7 +61,8 @@ Le modèle découle des limites du tableur de prospection actuel, où une même 
 - `flags` : liste libre (ex. `IN_DIFFICULTY`, `MAYBE_INACTIVE`, `BROKEN_CONTACT_FORM`)
 
 ### `Contact`
-- `company`, `fullName`, `role`, `phone`, `email`, `linkedinUrl`
+- `company`, `fullName`, `role`, `phone` (E.164, nullable), `email`, `linkedinUrl`
+- Plusieurs contacts par entreprise, un seul téléphone et un seul email par contact.
 - Un contact par personne, jamais un nom et un numéro dans le même champ.
 
 ### `Interaction` (historique, une ligne par tentative)
@@ -146,7 +148,7 @@ Le LLM n'est appelé **que** sur les signaux qui passent les règles éliminatoi
 
 Commande `app:import:prospection <fichier.xlsx>` (PhpSpreadsheet) :
 - une ligne → une `Company` (`scope = LOCAL`) ;
-- « Personne à contacter » → `Contact` (extraire un éventuel téléphone entre parenthèses) ;
+- « Personne à contacter » → `Contact` (extraire un éventuel téléphone entre parenthèses) ; un numéro seul, sans nom, va dans `Company.phone` (pas de `Contact`) ;
 - « Date/Type de contact » et « Relance » → une ou plusieurs `Interaction` (dates au format `jj/mm/aa`, `jj/mm/aaaa` ou `mm/aa`) ;
 - « Réponse » / « Note » → `outcome` + `notes`, avec un mapping de mots-clés (« pas de besoin », « ne travaillent pas avec des freelances », « viennent d'embaucher »…) ; ce qui n'est pas reconnu va en `OTHER` ;
 - cellules `=HYPERLINK(url, nom)` → `website` + `name` ;
