@@ -6,7 +6,7 @@ Dernière mise à jour : 2026-10-12
 
 - [x] 1. Docker Compose (PHP/Apache, PostgreSQL, Nuxt) — un compose par repo, Traefik (réseau `web`)
 - [x] 2. Entités + migrations
-- [ ] 3. Import du tableur
+- [x] 3. Import du tableur
 - [ ] 4. Source IMAP (alertes email)
 - [ ] 5. Résolution d'entreprise + scoring en deux étapes
 - [ ] 6. Dashboard Nuxt : liste triée par score, fiche entreprise, saisie d'interaction
