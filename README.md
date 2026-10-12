@@ -1,7 +1,7 @@
 # Radar Partenaires
 
 > Nom de projet provisoire. Document de contexte pour toute personne ou IA qui rejoint le projet.
-> Détail du modèle et des conventions : [`CLAUDE.md`](CLAUDE.md). Suivi : [`AVANCEMENT.md`](AVANCEMENT.md).
+> Conventions : [`CLAUDE.md`](CLAUDE.md). Suivi : [`AVANCEMENT.md`](AVANCEMENT.md). Détail : [`docs/domain.md`](docs/domain.md) (modèle), [`docs/pipeline.md`](docs/pipeline.md) (pipeline, scoring), [`docs/sources.md`](docs/sources.md) (sourcing), [`docs/import.md`](docs/import.md) (import du tableur).
 
 ## En une phrase
 
@@ -76,12 +76,15 @@ Principes : une source, un enricher ou une règle de scoring = une classe tagué
 
 ## Où on en est
 
-Voir [`AVANCEMENT.md`](AVANCEMENT.md). Fait : Docker, entités + migrations, import du tableur. À venir : sources de signaux (alertes email IMAP en premier), résolution d'entreprise et scoring, dashboard Nuxt.
+Voir [`AVANCEMENT.md`](AVANCEMENT.md). Fait : Docker, entités + migrations, import du tableur, connexion IMAP testée (boîte Gmail dédiée). En cours : sourcing (alertes Free-Work et LinkedIn en attente d'échantillons). À venir : lecteur IMAP et parseurs, résolution d'entreprise et scoring, dashboard Nuxt.
 
 ## Sources de signaux : contraintes
 
+Détail, pistes et décisions : [`docs/sources.md`](docs/sources.md).
+
 - **Interdit** : scraper LinkedIn ou toute plateforme dont les CGU l'interdisent. Vérifier les CGU avant d'ajouter une source.
 - API France Travail (Offres d'emploi) : accès non garanti, ne pas en dépendre.
+- **Piste, pas avant l'IMAP** : [Apify](https://apify.com) (scrapers « Actors » appelés par API, payés à l'usage). Utile d'abord pour la détection de stack sur les sites d'entreprises déjà connues (`Enricher`), éventuellement pour des offres Welcome to the Jungle après vérification des CGU. Actors communautaires, donc fiabilité variable ; la responsabilité juridique de l'usage revient à l'utilisateur.
 - PHP 8.4 n'a pas d'extension `imap` : lecture IMAP via une librairie PHP pure.
 
 ## Conventions
