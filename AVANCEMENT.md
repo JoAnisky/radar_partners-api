@@ -1,11 +1,11 @@
 # Avancement — Radar Partenaires
 
-Dernière mise à jour : 2026-10-08
+Dernière mise à jour : 2026-10-12
 
 ## MVP
 
 - [x] 1. Docker Compose (PHP/Apache, PostgreSQL, Nuxt) — un compose par repo, Traefik (réseau `web`)
-- [ ] 2. Entités + migrations
+- [x] 2. Entités + migrations
 - [ ] 3. Import du tableur
 - [ ] 4. Source IMAP (alertes email)
 - [ ] 5. Résolution d'entreprise + scoring en deux étapes
