@@ -21,7 +21,8 @@
         "symfony/runtime": "8.1.*",
         "symfony/scheduler": "8.1.*",
         "symfony/uid": "8.1.*",
-        "symfony/yaml": "8.1.*"
+        "symfony/yaml": "8.1.*",
+        "webklex/php-imap": "^6.2"
     },
     "config": {
         "allow-plugins": {
