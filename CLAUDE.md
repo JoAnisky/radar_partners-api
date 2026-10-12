@@ -58,10 +58,12 @@ Le modèle découle des limites du tableur de prospection actuel, où une même 
 - `status` : enum `PipelineStatus` → `TO_CONTACT`, `CONTACTED`, `FOLLOW_UP`, `MEETING`, `PARTNER`, `ON_HOLD`, `EXCLUDED`
 - `recontactAfter` : `?DateTimeImmutable`
 - `score` (int 0–100), `scoreExplanation` (texte)
+- `notes` (texte libre)
+- `archivedAt` : `?DateTimeImmutable`, soft delete (une entreprise n'est jamais supprimée, ni son historique)
 - `flags` : liste libre (ex. `IN_DIFFICULTY`, `MAYBE_INACTIVE`, `BROKEN_CONTACT_FORM`)
 
 ### `Contact`
-- `company`, `fullName`, `role`, `phone` (E.164, nullable), `email`, `linkedinUrl`
+- `company`, `fullName`, `role`, `phone` (E.164, nullable), `email`, `linkedinUrl`, `notes`
 - Plusieurs contacts par entreprise, un seul téléphone et un seul email par contact.
 - Un contact par personne, jamais un nom et un numéro dans le même champ.
 
