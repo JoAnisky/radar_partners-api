@@ -4,7 +4,9 @@ RUN a2enmod rewrite
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libicu-dev libzip-dev libpq-dev libonig-dev \
-    && docker-php-ext-install pdo pdo_pgsql intl zip mbstring \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install pdo pdo_pgsql intl zip mbstring gd \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
