@@ -22,7 +22,7 @@
 | Source | Statut |
 |---|---|
 | **Free-Work** (alerte mail quotidienne le matin) | MVP, alerte créée, aucun échantillon reçu. Beaucoup de bruit (Angular, Java, React) ; pas de champ d'exclusion trouvé, les compétences du profil pilotent peut-être l'alerte (non vérifié). |
-| **LinkedIn** (alertes natives par mail) | MVP, via règle de transfert depuis la boîte principale. Échantillons à fournir. |
+| **LinkedIn** (alertes natives par mail) | MVP, via règle de transfert depuis la boîte principale. Deux alertes freelance créées : dernières 24 h (flux) et sans limite de durée (amorçage, à supprimer ensuite). Échantillons à fournir. |
 | **Welcome to the Jungle, HelloWork** | Piste après Free-Work. Emploi salarié : signal « entreprise qui recrute un dev ». Alertes mail non vérifiées. |
 | **API France Travail** | Non vérifié, ne pas en dépendre. Jeu open data trimestriel : trop lent pour un signal. |
 | **Apify** | Piste après l'IMAP : détection de stack (`Enricher`) sur les sites connus ; offres WTTJ éventuelles après vérification des CGU. Actors communautaires, responsabilité de l'usage à l'utilisateur. Plan gratuit 5 $/mois. |
@@ -31,6 +31,12 @@
 ## Règle de filtrage à valider
 
 Un signal sans aucun mot-clé de la stack (Symfony, PHP, WordPress, Nuxt, Vue, Docker, K3s, DevOps… liste configurable) n'est pas retenu : ni signal, ni `Company` créée. Évite que le bruit des alertes pollue la base (scope national : une entreprise n'existe que si un signal pertinent la fait apparaître). **Proposé, pas encore décidé.**
+
+## Contraintes de conception (alertes mail)
+
+- Deux alertes qui se chevauchent : dédupliquer par **identité de l'offre** (ex. identifiant d'offre dans l'URL, à confirmer sur un échantillon), pas par `Message-ID`.
+- Amorçage (alerte sans limite) : renseigner `publishedAt` quand le mail l'indique ; ne jamais le remplacer par `detectedAt` (fausserait le bonus « urgence »).
+- Premier lot volumineux : règles PHP éliminatoires avant tout appel LLM.
 
 ## Boîte IMAP
 
