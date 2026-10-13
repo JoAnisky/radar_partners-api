@@ -33,7 +33,8 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 
 - [x] **Score explicable** : 9 règles (`src/Scoring/`), explication enregistrée, recalcul à chaque écriture et par `app:score:recompute` ; affiché dans la liste (tri par défaut) et la fiche. 203 tests. Voir `docs/pipeline.md`.
 - [ ] **Résolution d'entreprise** (`ResolveCompany`) pour les signaux avec un nom d'entreprise (LinkedIn) ; Free-Work reste manuel.
-- [ ] Ajuster les poids après quelques semaines d'usage ; règles « modalité » et « urgence » à ajouter.
+- [x] La preuve de besoin (offre dans la stack, télétravail) l'emporte sur l'adéquation de profil ; une entreprise hors région n'est pas pénalisée. 215 tests.
+- [ ] Ajuster les poids après quelques semaines d'usage ; règle « urgence » à ajouter.
 
 ## Dashboard (étape 6) : première tranche
 
