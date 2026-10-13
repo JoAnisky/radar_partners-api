@@ -28,7 +28,7 @@ final readonly class ReferentialClient
         for ($page = 1;; ++$page) {
             $params = array_filter(['q' => $query]) + $filters + ['etat_administratif' => 'A'];
             $data = $this->httpClient->request('GET', self::URL, [
-                'query' => $params + ['per_page' => self::PER_PAGE, 'page' => $page],
+                'query' => $params + ['per_page' => self::PER_PAGE, 'page' => $page, 'limite_matching_etablissements' => 100],
                 'timeout' => 20,
             ])->toArray();
             usleep($this->delayMicroseconds);
