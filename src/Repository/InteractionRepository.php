@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Company;
+use App\Entity\Contact;
 use App\Entity\Interaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,6 +27,15 @@ class InteractionRepository extends ServiceEntityRepository
             ->addOrderBy('i.id', 'DESC')
             ->getQuery()
             ->getResult();
+
+        return $items;
+    }
+
+    /** @return list<Interaction> */
+    public function findByContact(Contact $contact): array
+    {
+        /** @var list<Interaction> $items */
+        $items = $this->findBy(['contact' => $contact]);
 
         return $items;
     }

@@ -8,6 +8,8 @@ use App\Api\ContactUpdater;
 use App\Entity\Company;
 use App\Entity\Contact;
 use App\Repository\ContactRepository;
+use App\Repository\InteractionRepository;
+use App\Scoring\CompanyScorer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,8 +22,10 @@ final class ContactController extends AbstractController
 {
     public function __construct(
         private readonly ContactRepository $contacts,
+        private readonly InteractionRepository $interactions,
         private readonly ContactUpdater $updater,
         private readonly CompanyPresenter $presenter,
+        private readonly CompanyScorer $scorer,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -56,6 +60,8 @@ final class ContactController extends AbstractController
 
         $this->em->persist($contact);
         $this->em->flush();
+        $this->scorer->rescore($company);
+        $this->em->flush();
 
         return $this->json($this->presenter->contact($contact), Response::HTTP_CREATED);
     }
@@ -65,6 +71,8 @@ final class ContactController extends AbstractController
     {
         $this->updater->update($contact, $request->toArray());
         $this->em->flush();
+        $this->scorer->rescore($contact->getCompany());
+        $this->em->flush();
 
         return $this->json($this->presenter->contact($contact));
     }
@@ -73,8 +81,15 @@ final class ContactController extends AbstractController
     #[Route('/api/contacts/{id}', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function delete(Contact $contact): Response
     {
-        $contact->getCompany()->removeContact($contact);
+        foreach ($this->interactions->findByContact($contact) as $interaction) {
+            $interaction->setContact(null);
+        }
+
+        $company = $contact->getCompany();
+        $company->removeContact($contact);
         $this->em->remove($contact);
+        $this->em->flush();
+        $this->scorer->rescore($company);
         $this->em->flush();
 
         return new Response(status: Response::HTTP_NO_CONTENT);

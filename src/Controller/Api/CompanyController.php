@@ -10,6 +10,7 @@ use App\Entity\Company;
 use App\Repository\CompanyRepository;
 use App\Repository\InteractionRepository;
 use App\Repository\SignalRepository;
+use App\Scoring\CompanyScorer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,6 +29,7 @@ final class CompanyController extends AbstractController
         private readonly SignalRepository $signals,
         private readonly CompanyPresenter $presenter,
         private readonly CompanyUpdater $updater,
+        private readonly CompanyScorer $scorer,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -73,6 +75,8 @@ final class CompanyController extends AbstractController
             ->setNotes($input->notes);
         $this->em->persist($company);
         $this->em->flush();
+        $this->scorer->rescore($company);
+        $this->em->flush();
 
         return $this->json($this->presenter->detail($company, [], []), Response::HTTP_CREATED);
     }
@@ -81,6 +85,8 @@ final class CompanyController extends AbstractController
     public function update(Company $company, Request $request): JsonResponse
     {
         $this->updater->update($company, $request->toArray(), new \DateTimeImmutable());
+        $this->em->flush();
+        $this->scorer->rescore($company);
         $this->em->flush();
 
         return $this->show($company);

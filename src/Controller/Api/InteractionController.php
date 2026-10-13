@@ -9,6 +9,7 @@ use App\Entity\Company;
 use App\Entity\Contact;
 use App\Entity\Interaction;
 use App\Repository\InteractionRepository;
+use App\Scoring\CompanyScorer;
 use App\Service\PipelineStatusResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,7 @@ final class InteractionController extends AbstractController
         private readonly InteractionRepository $interactions,
         private readonly InteractionUpdater $updater,
         private readonly PipelineStatusResolver $statusResolver,
+        private readonly CompanyScorer $scorer,
         private readonly CompanyPresenter $presenter,
         private readonly EntityManagerInterface $em,
     ) {
@@ -51,6 +53,8 @@ final class InteractionController extends AbstractController
         $this->em->persist($interaction);
         $this->statusResolver->register($company, $interaction, $previous);
         $this->em->flush();
+        $this->scorer->rescore($company);
+        $this->em->flush();
 
         $last = array_reduce(
             $previous,
@@ -74,6 +78,8 @@ final class InteractionController extends AbstractController
         if ($this->updater->update($interaction, $request->toArray())) {
             $this->statusResolver->followEdit($company, $before, $this->statusResolver->derive($interactions));
         }
+        $this->em->flush();
+        $this->scorer->rescore($company);
         $this->em->flush();
 
         $last = array_reduce(

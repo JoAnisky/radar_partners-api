@@ -10,6 +10,7 @@ use App\Enum\PipelineStatus;
 use App\Enum\SignalType;
 use App\Repository\CompanyRepository;
 use App\Repository\SignalRepository;
+use App\Scoring\CompanyScorer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,6 +27,7 @@ final class SignalController extends AbstractController
         private readonly SignalRepository $signals,
         private readonly CompanyRepository $companies,
         private readonly CompanyPresenter $presenter,
+        private readonly CompanyScorer $scorer,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -61,7 +63,8 @@ final class SignalController extends AbstractController
             }
         }
 
-        $changed = $company !== $signal->getCompany();
+        $previous = $signal->getCompany();
+        $changed = $company !== $previous;
         $signal->setCompany($company);
 
         // Une offre sur une entreprise en attente signale un nouveau besoin : elle remonte dans « à relancer ».
@@ -70,6 +73,10 @@ final class SignalController extends AbstractController
             $company->setRecontactAfter(new \DateTimeImmutable());
         }
 
+        $this->em->flush();
+        foreach (array_filter([$company, $previous !== $company ? $previous : null]) as $affected) {
+            $this->scorer->rescore($affected);
+        }
         $this->em->flush();
 
         return $this->json($this->presenter->signal($signal));
