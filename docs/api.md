@@ -41,6 +41,18 @@ Saisie d'une interaction : `channel` (obligatoire), `occurredAt` (défaut mainte
 
 Règle de statut (`PipelineStatusResolver::register`) : seule une interaction **significative et la plus récente** change le statut (et la date de relance) ; sinon un statut posé à la main est conservé, sauf `TO_CONTACT` qui passe à `CONTACTED`.
 
+### `GET /api/contacts`
+
+Tous les contacts des entreprises **non archivées**, paginés : `{ items, total, page, perPage }`. Chaque item reprend le contact et ajoute `company` (`id`, `name`, `city`, `status`) et `lastInteractionAt` (dernier échange où le contact est cité).
+
+Paramètres : `q` (nom, rôle, email, nom d'entreprise ; sans casse ni accents), `sort` (`fullName` par défaut, `company`, `lastInteractionAt` valeurs vides en dernier, `createdAt`), `direction`, `page`, `perPage` (1 à 100). Paramètre invalide : `422`. La création se fait depuis une entreprise (ci-dessous).
+
+### `POST /api/companies/{id}/contacts`, `PATCH /api/contacts/{id}`, `DELETE /api/contacts/{id}`
+
+Contact d'une entreprise : `fullName` (obligatoire, non vide), `role`, `phone` (normalisé en E.164, `422` si invalide), `email` (minuscules, validé), `linkedinUrl` (`https://` ajouté si absent), `notes`. Création : `201` avec le contact ; modification partielle (`null` ou chaîne vide pour vider, `fullName` ne peut pas être vidé) ; champ inconnu ou valeur invalide : `422`.
+
+`DELETE` (suppression d'un contact, exigence RGPD) répond `204` : le contact disparaît, **ses interactions sont conservées** et simplement détachées (`contactId` à `null`, clé étrangère `ON DELETE SET NULL`). Un texte libre (notes d'interaction) qui citerait la personne n'est pas modifié.
+
 ### `PATCH /api/interactions/{id}`
 
 Modification partielle d'une interaction : `channel`, `occurredAt` (non nul), `outcome`, `contactId` (`null` pour détacher ; doit appartenir à l'entreprise), `origin`, `notes`, `nextActionAt` (`null` pour vider). Champ inconnu ou valeur invalide : `422`. Renvoie `{ interaction, company }`.
@@ -57,7 +69,7 @@ Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `pag
 
 ## Décisions techniques
 
-- Pas d'authentification pour l'instant ; aucun endpoint de suppression (soft delete par `archived`).
+- Pas d'authentification pour l'instant ; seule suppression : les contacts (RGPD). Entreprises : soft delete (`archived`) ; interactions : modification seulement (l'historique est conservé).
 - Réponses construites à la main (`CompanyPresenter`), pas de sérialisation d'entités : contrôle de ce qui sort.
 - Paramètres de liste mappés par `#[MapQueryString]` (`CompanyListQuery`) avec validation.
 - CORS (`nelmio/cors-bundle`) limité à `/api/`, origines via `CORS_ALLOW_ORIGIN` (`radarpartners.dev.local` et localhost).
