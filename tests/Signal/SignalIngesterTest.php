@@ -82,4 +82,22 @@ final class SignalIngesterTest extends TestCase
 
         self::assertSame('Acme', $persisted?->getExtracted()['companyName']);
     }
+
+    public function testRemoteMentionIsStoredInExtractedData(): void
+    {
+        $persisted = null;
+
+        $this->ingester(null, $persisted, 1)->ingest($this->raw('Développeur Symfony Remote'));
+
+        self::assertTrue($persisted?->getExtracted()['remote']);
+    }
+
+    public function testNoRemoteMentionLeavesTheFlagOut(): void
+    {
+        $persisted = null;
+
+        $this->ingester(null, $persisted, 1)->ingest($this->raw());
+
+        self::assertArrayNotHasKey('remote', $persisted?->getExtracted() ?? []);
+    }
 }

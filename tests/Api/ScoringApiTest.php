@@ -88,11 +88,11 @@ final class ScoringApiTest extends ApiTestCase
         $signal = $this->signal('Dev Symfony', SignalType::FreelanceMission);
 
         $this->request('PATCH', '/api/signals/'.$signal->getId(), ['companyId' => $first->getId()]);
-        self::assertSame(35, $this->score((int) $first->getId()));
+        self::assertSame(55, $this->score((int) $first->getId()));
 
         $this->request('PATCH', '/api/signals/'.$signal->getId(), ['companyId' => $second->getId()]);
         self::assertSame(0, $this->score((int) $first->getId()));
-        self::assertSame(35, $this->score((int) $second->getId()));
+        self::assertSame(55, $this->score((int) $second->getId()));
 
         $this->request('PATCH', '/api/signals/'.$signal->getId(), ['companyId' => null]);
         self::assertSame(0, $this->score((int) $second->getId()));

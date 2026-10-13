@@ -25,11 +25,19 @@ final readonly class SignalIngester
             return IngestOutcome::Duplicate;
         }
 
+        $extracted = $raw->extracted;
+        if (null !== $raw->companyName) {
+            $extracted += ['companyName' => $raw->companyName];
+        }
+        if (!\array_key_exists('remote', $extracted) && RemoteDetector::isRemote($raw->title.' '.$raw->rawContent)) {
+            $extracted['remote'] = true;
+        }
+
         $signal = (new Signal($raw->type, $raw->source, $raw->fingerprint))
             ->setUrl($raw->url)
             ->setTitle($raw->title)
             ->setRawContent($raw->rawContent)
-            ->setExtracted(null === $raw->companyName ? $raw->extracted : $raw->extracted + ['companyName' => $raw->companyName])
+            ->setExtracted($extracted)
             ->setPublishedAt($raw->publishedAt);
 
         if (null !== $raw->observedAt) {
