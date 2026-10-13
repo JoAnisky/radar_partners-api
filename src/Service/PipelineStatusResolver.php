@@ -17,26 +17,53 @@ final readonly class PipelineStatusResolver
     }
 
     /**
+     * Statut et date de relance déduits de tout l'historique : la dernière interaction significative l'emporte.
+     *
+     * @param list<Interaction> $interactions
+     *
+     * @return array{status: PipelineStatus, recontactAfter: ?\DateTimeImmutable}
+     */
+    public function derive(array $interactions): array
+    {
+        usort($interactions, static fn (Interaction $a, Interaction $b): int => $b->getOccurredAt() <=> $a->getOccurredAt());
+
+        foreach ($interactions as $interaction) {
+            $status = self::statusFor($interaction->getOutcome());
+            if (null !== $status) {
+                return [
+                    'status' => $status,
+                    'recontactAfter' => PipelineStatus::OnHold === $status ? $this->onHoldUntil($interaction->getOccurredAt()) : null,
+                ];
+            }
+        }
+
+        return ['status' => [] === $interactions ? PipelineStatus::ToContact : PipelineStatus::Contacted, 'recontactAfter' => null];
+    }
+
+    /**
      * Recalcule le statut à partir de tout l'historique (import initial).
      *
      * @param list<Interaction> $interactions
      */
     public function apply(Company $company, array $interactions): void
     {
-        usort($interactions, static fn (Interaction $a, Interaction $b): int => $b->getOccurredAt() <=> $a->getOccurredAt());
+        $derived = $this->derive($interactions);
+        $company->setStatus($derived['status']);
+        $company->setRecontactAfter($derived['recontactAfter']);
+    }
 
-        $company->setRecontactAfter(null);
-        $company->setStatus([] === $interactions ? PipelineStatus::ToContact : PipelineStatus::Contacted);
-
-        foreach ($interactions as $interaction) {
-            $status = self::statusFor($interaction->getOutcome());
-            if (null === $status) {
-                continue;
-            }
-
-            $this->setStatus($company, $status, $interaction->getOccurredAt());
-
-            return;
+    /**
+     * Après modification d'une interaction : le statut suit la nouvelle déduction seulement s'il suivait
+     * déjà l'ancienne ; un statut posé à la main est conservé.
+     *
+     * @param array{status: PipelineStatus, recontactAfter: ?\DateTimeImmutable} $before
+     * @param array{status: PipelineStatus, recontactAfter: ?\DateTimeImmutable} $after
+     */
+    public function followEdit(Company $company, array $before, array $after): void
+    {
+        if ($before != $after && $company->getStatus() === $before['status']) {
+            $company->setStatus($after['status']);
+            $company->setRecontactAfter($after['recontactAfter']);
         }
     }
 

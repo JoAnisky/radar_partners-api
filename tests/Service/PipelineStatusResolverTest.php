@@ -112,4 +112,51 @@ final class PipelineStatusResolverTest extends TestCase
         self::assertSame(PipelineStatus::FollowUp, $company->getStatus());
         self::assertNull($company->getRecontactAfter());
     }
+
+    public function testDeriveUsesTheLatestSignificantInteraction(): void
+    {
+        $company = new Company('Acme');
+        $interactions = [
+            $this->interaction($company, '2026-09-01', InteractionOutcome::NoNeed),
+            $this->interaction($company, '2026-10-01', InteractionOutcome::MeetingScheduled),
+            $this->interaction($company, '2026-10-05', InteractionOutcome::NoAnswer),
+        ];
+
+        $derived = (new PipelineStatusResolver('P6M'))->derive($interactions);
+
+        self::assertSame(PipelineStatus::Meeting, $derived['status']);
+        self::assertNull($derived['recontactAfter']);
+    }
+
+    public function testDeriveWithoutInteractions(): void
+    {
+        self::assertSame(PipelineStatus::ToContact, (new PipelineStatusResolver('P6M'))->derive([])['status']);
+    }
+
+    public function testFollowEditUpdatesOnlyAStatusThatFollowedTheDerivation(): void
+    {
+        $resolver = new PipelineStatusResolver('P6M');
+        $before = ['status' => PipelineStatus::Contacted, 'recontactAfter' => null];
+        $after = ['status' => PipelineStatus::OnHold, 'recontactAfter' => new \DateTimeImmutable('2027-04-01')];
+
+        $following = (new Company('A'))->setStatus(PipelineStatus::Contacted);
+        $resolver->followEdit($following, $before, $after);
+        self::assertSame(PipelineStatus::OnHold, $following->getStatus());
+        self::assertSame('2027-04-01', $following->getRecontactAfter()?->format('Y-m-d'));
+
+        $manual = (new Company('B'))->setStatus(PipelineStatus::Partner);
+        $resolver->followEdit($manual, $before, $after);
+        self::assertSame(PipelineStatus::Partner, $manual->getStatus());
+        self::assertNull($manual->getRecontactAfter());
+    }
+
+    public function testFollowEditDoesNothingWhenNothingChanged(): void
+    {
+        $company = (new Company('A'))->setStatus(PipelineStatus::OnHold)->setRecontactAfter(new \DateTimeImmutable('2027-01-15'));
+        $derived = ['status' => PipelineStatus::OnHold, 'recontactAfter' => new \DateTimeImmutable('2027-04-01')];
+
+        (new PipelineStatusResolver('P6M'))->followEdit($company, $derived, $derived);
+
+        self::assertSame('2027-01-15', $company->getRecontactAfter()?->format('Y-m-d'));
+    }
 }

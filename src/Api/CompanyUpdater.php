@@ -27,7 +27,7 @@ final readonly class CompanyUpdater
         }
 
         if (\array_key_exists('status', $payload)) {
-            $status = self::enum(PipelineStatus::class, $payload['status'], 'status');
+            $status = Payload::enum(PipelineStatus::class, $payload['status'], 'status');
             $changed = $status !== $company->getStatus();
             $company->setStatus($status);
             if ($changed && !\array_key_exists('recontactAfter', $payload)) {
@@ -36,19 +36,19 @@ final readonly class CompanyUpdater
         }
 
         if (\array_key_exists('recontactAfter', $payload)) {
-            $company->setRecontactAfter(self::nullableDate($payload['recontactAfter']));
+            $company->setRecontactAfter(Payload::nullableDate($payload['recontactAfter'], 'recontactAfter'));
         }
 
         if (\array_key_exists('type', $payload)) {
-            $company->setType(self::enum(CompanyType::class, $payload['type'], 'type'));
+            $company->setType(Payload::enum(CompanyType::class, $payload['type'], 'type'));
         }
 
         if (\array_key_exists('scope', $payload)) {
-            $company->setScope(self::enum(Scope::class, $payload['scope'], 'scope'));
+            $company->setScope(Payload::enum(Scope::class, $payload['scope'], 'scope'));
         }
 
         if (\array_key_exists('notes', $payload)) {
-            $company->setNotes(self::nullableString($payload['notes'], 'notes', 10000));
+            $company->setNotes(Payload::nullableString($payload['notes'], 'notes', 10000));
         }
 
         if (\array_key_exists('flags', $payload)) {
@@ -60,45 +60,6 @@ final readonly class CompanyUpdater
                 throw new UnprocessableEntityHttpException('archived doit être un booléen.');
             }
             $payload['archived'] ? $company->archive() : $company->unarchive();
-        }
-    }
-
-    /**
-     * @template T of \BackedEnum
-     *
-     * @param class-string<T> $enum
-     *
-     * @return T
-     */
-    private static function enum(string $enum, mixed $value, string $field): \BackedEnum
-    {
-        $case = \is_string($value) || \is_int($value) ? $enum::tryFrom($value) : null;
-
-        return $case ?? throw new UnprocessableEntityHttpException(sprintf('Valeur invalide pour %s.', $field));
-    }
-
-    private static function nullableString(mixed $value, string $field, int $max): ?string
-    {
-        if (null === $value) {
-            return null;
-        }
-        if (!\is_string($value) || mb_strlen($value) > $max) {
-            throw new UnprocessableEntityHttpException(sprintf('%s doit être un texte de %d caractères maximum.', $field, $max));
-        }
-
-        return '' === trim($value) ? null : $value;
-    }
-
-    private static function nullableDate(mixed $value): ?\DateTimeImmutable
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        try {
-            return \is_string($value) ? new \DateTimeImmutable($value) : throw new \InvalidArgumentException();
-        } catch (\Exception) {
-            throw new UnprocessableEntityHttpException('recontactAfter doit être une date (ex. 2026-12-01) ou null.');
         }
     }
 
