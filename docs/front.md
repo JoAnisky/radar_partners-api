@@ -20,13 +20,16 @@ Modèle visuel : une capture de tableau de bord « Apex » en mode sombre (non v
 - **Mise en page** (`layouts/default.vue`) : sidebar repliable et redimensionnable (marque, bouton de recherche ⌘K, sections *Prospection* : Entreprises, Contacts, et *Veille* : Signaux avec pastille du nombre d'offres à rattacher), barre du haut avec le titre de la page (`definePageMeta({ title })`) et le bouton « + Entreprise ».
 - **Recherche globale ⌘K** (`composables/useGlobalSearch.ts`) : pages filtrées localement, entreprises et contacts cherchés côté serveur (2 caractères minimum, délai de 250 ms, réponses périmées ignorées).
 - **Création d'une entreprise** à la main (`components/CompanyCreateModal.vue`), jusque-là impossible hors rattachement d'un signal.
-- **Pas encore fait** (étape 2) : page d'accueil de type tableau de bord (cartes KPI avec mini-courbes, donut des statuts, activité dans le temps, « à relancer »), qui demande un endpoint de statistiques côté API ; bloc utilisateur (attend l'authentification).
+- **Accueil de type tableau de bord** (`pages/index.vue`, alimenté par `GET /api/stats`) : 4 cartes indicateurs avec tendance et mini-courbe (entreprises suivies, à relancer, interactions et offres sur 30 jours), grand graphique d'activité par semaine avec sélecteur (interactions / offres / nouvelles entreprises), donut du pipeline (légende cliquable vers la liste filtrée), barres d'avancement de la base, et trois listes (à relancer, à contacter en priorité, dernières offres). Graphiques en SVG maison, sans librairie (`utils/chart.ts` pour les calculs, testés à part).
+- **Pas encore fait** : bloc utilisateur en bas de la sidebar (attend l'authentification).
+- Les dates affichées sont les jours calendaires du serveur lus dans la chaîne ISO (`formatDate`), jamais reconvertis dans le fuseau du navigateur.
 
 ## Pages et composants
 
 | Fichier | Rôle |
 |---|---|
-| `pages/index.vue` | Liste des entreprises triée par score par défaut : recherche, filtre de statut, tri, « À relancer », pagination |
+| `pages/index.vue` | Accueil : indicateurs, activité, pipeline, avancement et listes |
+| `pages/companies/index.vue` | Liste des entreprises triée par score par défaut : recherche, filtre de statut, tri, « À relancer », pagination ; filtres initialisés depuis l'adresse (`?status=…&due=1`) |
 | `pages/companies/[id].vue` | Fiche : infos, statut modifiable, archivage, notes, contacts, historique, signaux |
 | `pages/contacts.vue` | Onglet Contacts : tous les contacts avec leur entreprise (liens vers la fiche), recherche, tri, pagination |
 | `layouts/default.vue` | Sidebar, barre du haut, recherche ⌘K, modal de création |
@@ -35,6 +38,7 @@ Modèle visuel : une capture de tableau de bord « Apex » en mode sombre (non v
 | `components/CompanyForm.vue` | Modification des informations d'une entreprise (bouton « Modifier » de la carte Informations) ; n'envoie que les champs changés |
 | `components/InteractionForm.vue` | Saisie ou modification d'une interaction (bouton « Modifier » dans l'historique) ; les dates inchangées ne sont pas renvoyées |
 | `pages/signals.vue` + `components/SignalAttach.vue` | Offres sans entreprise : recherche d'une entreprise et rattachement, ou création |
+| `components/KpiCard.vue`, `SparklineChart.vue`, `AreaChart.vue`, `DonutChart.vue`, `DashboardCard.vue`, `SegmentedControl.vue` | Briques du tableau de bord (carte indicateur, mini-courbe, courbe d'activité, donut, carte, sélecteur) |
 | `components/StatusBadge.vue`, `components/ScoreBadge.vue` | Badges de statut et de score (couleur selon le niveau) ; la fiche affiche le détail du score |
 
 ## Vérifications

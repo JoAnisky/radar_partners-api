@@ -67,6 +67,19 @@ Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `pag
 
 `{"companyId": 12}` rattache, `{"companyId": null}` détache ; rien d'autre n'est accepté. Règle : rattacher une offre (`JOB_POSTING` ou `FREELANCE_MISSION`) à une entreprise `ON_HOLD` met sa date de relance à maintenant : elle remonte dans « à relancer ».
 
+### `GET /api/stats`
+
+Tout ce qu'affiche l'accueil, en un appel (`src/Stats/StatsProvider.php`) :
+
+- `weeks` : lundis des 12 dernières semaines (la semaine en cours en dernier) ; chaque série est alignée dessus.
+- `kpis` : `companies` (`total`, `createdLast7Days`, `series` cumulée), `due` (`total`), `interactions` et `signals` (`last30Days`, `previous30Days`, `deltaPercent` ou `null` sans période de comparaison, `series` hebdomadaire ; `signals.unresolved` = offres à rattacher).
+- `activity` : séries hebdomadaires `interactions`, `signals` et `companies` (nouvelles entreprises).
+- `pipeline` : tous les statuts, dans l'ordre de l'énumération, avec leur nombre.
+- `progress` : `total`, `contacted` (au moins une interaction), `reachable` (au moins un contact avec téléphone ou email), `typed` (type renseigné).
+- `lists` : `due` (relance dépassée ou action échue), `priorities` (« à contacter » les mieux classées) et `recentSignals`, 5 éléments maximum chacune.
+
+Les entreprises archivées sont exclues partout.
+
 ## Score
 
 `score` (0–100) figure dans les résumés et `scoreExplanation` (lignes « +20 Agence web », …, « Total : 40 ») dans la fiche. Il est recalculé après chaque écriture qui le touche ; le tri `sort=score` fonctionne sur `GET /api/companies`. Règles et poids : `docs/pipeline.md`.
