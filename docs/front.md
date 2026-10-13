@@ -1,0 +1,29 @@
+# Front (Nuxt)
+
+> Repo `front/`. Dev : `make up` dans `front/` → `http://radarpartners.dev.local`. Types et libellés reprennent le contrat décrit dans `docs/api.md`.
+
+## Choix
+
+- **SPA** (`ssr: false`) : tableau de bord privé, pas de rendu serveur ; le navigateur appelle l'API directement (`NUXT_PUBLIC_API_BASE_URL`, CORS côté API).
+- **Nuxt UI v4** (Tailwind 4) : composants `UTable`, `USelect`, `UCard`, `UBadge`… ; `UApp` à la racine pour les toasts. CSS : `app/assets/css/main.css`.
+- Client HTTP : `useApi()` (`$fetch.create` avec la `baseURL` de la config publique). Types de l'API : `app/types/api.ts`. Libellés français et couleurs de statut : `app/utils/labels.ts`.
+
+## Pages et composants
+
+| Fichier | Rôle |
+|---|---|
+| `pages/index.vue` | Liste des entreprises : recherche, filtre de statut, tri, « À relancer », pagination |
+| `pages/companies/[id].vue` | Fiche : infos, statut modifiable, archivage, notes, contacts, historique, signaux |
+| `components/InteractionForm.vue` | Saisie d'une interaction (met à jour le statut côté API) |
+| `pages/signals.vue` + `components/SignalAttach.vue` | Offres sans entreprise : recherche d'une entreprise et rattachement, ou création |
+| `components/StatusBadge.vue` | Badge de statut |
+
+## Vérifications
+
+- Types : `docker exec radarpartners-front npx vue-tsc --noEmit` (TypeScript **5** : `vue-tsc` ne supporte pas encore TypeScript 7).
+- Pas encore de tests ni d'ESLint ; l'interface n'a pas été vérifiée visuellement (aucun navigateur côté outils de développement).
+
+## Points ouverts
+
+- `npm audit` : 15 alertes (2 critiques) toutes indirectes via `nuxt` (devtools, nitropack) ; le correctif proposé par npm est une rétrogradation en Nuxt 3, à ne pas faire. À suivre aux mises à jour de Nuxt.
+- Pas d'authentification ; pas de pagination de la page des signaux (50 premiers).

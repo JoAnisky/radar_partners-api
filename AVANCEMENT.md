@@ -33,7 +33,7 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 
 - [x] **API de lecture** : `GET /api/companies` (filtres, tri, pagination, recherche sans accent) et `GET /api/companies/{id}` (contacts, interactions, signaux), CORS, 91 tests dont des tests sur base `radar_test`. Voir `docs/api.md`.
 - [x] **API d'écriture** : création d'entreprise, modification partielle (statut, notes, flags, archivage), saisie d'interaction (statut mis à jour sans écraser un statut manuel), liste des signaux et rattachement à une entreprise. 122 tests. Voir `docs/api.md`.
-- [ ] **Front Nuxt** avec Nuxt UI : liste (onglet « À relancer »), fiche entreprise, formulaire d'interaction, page des signaux sans entreprise.
+- [~] **Front Nuxt** avec Nuxt UI : liste (filtre « À relancer »), fiche entreprise, formulaire d'interaction et page des signaux sans entreprise écrits ; types vérifiés (`vue-tsc`) et composants compilés par Vite, **pas encore vérifiés visuellement**. Reste : essai dans le navigateur, ESLint, tests. Voir `docs/front.md`.
 - [ ] Authentification avant toute exposition (prod ou démo).
 
 ## En attendant les échantillons d'alertes (ordre recommandé)
