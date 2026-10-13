@@ -29,6 +29,13 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 - Boîte IMAP : Gmail dédié + mot de passe d'application (Outlook.com OAuth seul, Proton Bridge payant, `contact@` à éviter).
 - Ordre des sources : référentiel Recherche d'entreprises et IMAP d'abord ; Apify, Welcome to the Jungle, HelloWork ensuite (voir `docs/sources.md`).
 
+## Dashboard (étape 6) : première tranche
+
+- [x] **API de lecture** : `GET /api/companies` (filtres, tri, pagination, recherche sans accent) et `GET /api/companies/{id}` (contacts, interactions, signaux), CORS, 91 tests dont des tests sur base `radar_test`. Voir `docs/api.md`.
+- [ ] **API d'écriture** : saisie d'une interaction (met à jour le statut via `PipelineStatusResolver`), modification du statut et des notes, archivage ; liste des signaux sans entreprise et rattachement à une entreprise.
+- [ ] **Front Nuxt** avec Nuxt UI : liste (onglet « À relancer »), fiche entreprise, formulaire d'interaction, page des signaux sans entreprise.
+- [ ] Authentification avant toute exposition (prod ou démo).
+
 ## En attendant les échantillons d'alertes (ordre recommandé)
 
 1. [x] **Référentiel Recherche d'entreprises** : client, DTO, `app:referential:search` (exploration) et `app:referential:import` (création + rapprochement du tableur, `--dry-run`). **Import réel lancé le 2026-10-13** (agglomération de Besançon, effectif ≥ 1, 10 codes NAF) : 135 créées, 12 rapprochées, soit 163 entreprises en base dont 16 du tableur sans SIREN (nom commercial ≠ dénomination légale, ou hors agglomération : Atol CD, Tête de com, Facton à Lure…). Reste : les rapprocher à part ; la taille servira au scoring (étape 5).
