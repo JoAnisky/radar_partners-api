@@ -29,6 +29,14 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 - Boîte IMAP : Gmail dédié + mot de passe d'application (Outlook.com OAuth seul, Proton Bridge payant, `contact@` à éviter).
 - Ordre des sources : référentiel Recherche d'entreprises et IMAP d'abord ; Apify, Welcome to the Jungle, HelloWork ensuite (voir `docs/sources.md`).
 
+## En attendant les échantillons d'alertes (ordre recommandé)
+
+1. [~] **Référentiel Recherche d'entreprises** : client HTTP, DTO et commande d'exploration `app:referential:search` faits (lecture seule). Reste : décider quoi créer en base (zone, effectif, NAF) puis rapprocher les 28 entreprises importées (`siren`, `nafCode`, `headcountRange`) ; resservira à l'étape 5.
+2. [ ] **Lecteur IMAP générique** : lecture de la boîte, filtre expéditeur, marquage des mails traités, corps brut ; testable sans parseur.
+3. [ ] **Socle du pipeline** : `SignalSourceInterface`, `RawSignal`, `ScoringRuleInterface`, `IngestSignal` (dédup par `fingerprint`). À faire après au moins un vrai mail, pour que `RawSignal` reflète les alertes.
+4. [ ] **Règles éliminatoires** (stack, type d'entreprise, présentiel hors région) : attend la décision sur le filtre par stack.
+5. [ ] **Petites dettes** : config PHPStan pour les faux positifs `$id`, fixtures Faker pour la démo.
+
 ## À faire / points ouverts
 
 - **Sourcing** : recevoir les premiers mails d'alerte (Free-Work, LinkedIn), les transférer en `.eml` dans `var/import/samples/`, puis écrire lecteur IMAP et parseurs.
