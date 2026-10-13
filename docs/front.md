@@ -12,6 +12,16 @@
 
 Par défaut `nuxt dev` fait tourner l'application dans un processus enfant derrière un processus parent qui relaie les requêtes ; ce relais coupe la WebSocket de Vite (`ECONNRESET`, erreur « WebSocket connection to ws://radarpartners.dev.local/_nuxt/ failed » dans la console). La commande du conteneur utilise donc `nuxt dev --host 0.0.0.0 --no-fork` (`front/.docker/Dockerfile`). Test : une requête d'upgrade WebSocket sur `/_nuxt/?token=…` doit répondre 101, y compris via Traefik.
 
+## Design
+
+Modèle visuel : une capture de tableau de bord « Apex » en mode sombre (non versionnée). Appliqué :
+
+- **Thème sombre uniquement, sans bascule** : `colorMode` forcé (`nuxt.config.ts`), couleur primaire **émeraude** et neutre `neutral` (`app/app.config.ts`), fond quasi noir, cartes `bg-elevated` à coins arrondis et bordure fine (variables `--ui-*` dans `app/assets/css/main.css`). Langue française de Nuxt UI via `UApp :locale="fr"` (`app/app.vue`) ; icônes Lucide embarquées (`@iconify-json/lucide`).
+- **Mise en page** (`layouts/default.vue`) : sidebar repliable et redimensionnable (marque, bouton de recherche ⌘K, sections *Prospection* : Entreprises, Contacts, et *Veille* : Signaux avec pastille du nombre d'offres à rattacher), barre du haut avec le titre de la page (`definePageMeta({ title })`) et le bouton « + Entreprise ».
+- **Recherche globale ⌘K** (`composables/useGlobalSearch.ts`) : pages filtrées localement, entreprises et contacts cherchés côté serveur (2 caractères minimum, délai de 250 ms, réponses périmées ignorées).
+- **Création d'une entreprise** à la main (`components/CompanyCreateModal.vue`), jusque-là impossible hors rattachement d'un signal.
+- **Pas encore fait** (étape 2) : page d'accueil de type tableau de bord (cartes KPI avec mini-courbes, donut des statuts, activité dans le temps, « à relancer »), qui demande un endpoint de statistiques côté API ; bloc utilisateur (attend l'authentification).
+
 ## Pages et composants
 
 | Fichier | Rôle |
@@ -19,6 +29,8 @@ Par défaut `nuxt dev` fait tourner l'application dans un processus enfant derri
 | `pages/index.vue` | Liste des entreprises triée par score par défaut : recherche, filtre de statut, tri, « À relancer », pagination |
 | `pages/companies/[id].vue` | Fiche : infos, statut modifiable, archivage, notes, contacts, historique, signaux |
 | `pages/contacts.vue` | Onglet Contacts : tous les contacts avec leur entreprise (liens vers la fiche), recherche, tri, pagination |
+| `layouts/default.vue` | Sidebar, barre du haut, recherche ⌘K, modal de création |
+| `components/CompanyCreateModal.vue` | Création d'une entreprise (nom, type, zone, ville, site) |
 | `components/ContactForm.vue` | Ajout et modification d'un contact ; ajout, modification et suppression (avec confirmation) depuis la carte Contacts |
 | `components/CompanyForm.vue` | Modification des informations d'une entreprise (bouton « Modifier » de la carte Informations) ; n'envoie que les champs changés |
 | `components/InteractionForm.vue` | Saisie ou modification d'une interaction (bouton « Modifier » dans l'historique) ; les dates inchangées ne sont pas renvoyées |

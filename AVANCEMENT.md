@@ -43,7 +43,9 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 - [x] **Gestion des contacts** : création, modification et suppression (RGPD, interactions conservées) depuis la fiche ; onglet Contacts (liste globale avec recherche, tri, dernier échange). 157 tests.
 - [x] **Modification des informations d'une entreprise** : nom, site, adresse, ville, code postal, téléphone, email, SIREN, NAF, effectif, type, zone (validations, 409 sur nom/SIREN en doublon) ; formulaire dans la fiche. 142 tests.
 - [x] **Modification d'une interaction** : `PATCH /api/interactions/{id}`, le statut suit la déduction seulement s'il la suivait déjà ; bouton « Modifier » dans l'historique. 137 tests.
-- [~] **Front Nuxt** avec Nuxt UI : liste (filtre « À relancer »), fiche entreprise, formulaire d'interaction et page des signaux sans entreprise écrits ; types vérifiés (`vue-tsc`) et composants compilés par Vite, **pas encore vérifiés visuellement**. ESLint et 50 tests Vitest (formulaires, pages) en place ; `nuxt typecheck` propre. Reste : essai dans le navigateur. Voir `docs/front.md`.
+- [x] **Design, étape 1** : thème sombre émeraude, sidebar et barre du haut, recherche ⌘K, création d'entreprise ; 66 tests front. À vérifier visuellement par l'utilisateur.
+- [ ] **Design, étape 2** : accueil de type tableau de bord (KPI, donut des statuts, activité, « à relancer ») + endpoint de statistiques.
+- [~] **Front Nuxt** avec Nuxt UI : liste (filtre « À relancer »), fiche entreprise, formulaire d'interaction et page des signaux sans entreprise écrits ; types vérifiés (`vue-tsc`) et composants compilés par Vite, **pas encore vérifiés visuellement**. ESLint et Vitest (formulaires, pages) en place ; `nuxt typecheck` propre. Reste : essai dans le navigateur. Voir `docs/front.md`.
 - [ ] Authentification avant toute exposition (prod ou démo).
 
 ## En attendant les échantillons d'alertes (ordre recommandé)
