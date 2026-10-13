@@ -31,7 +31,7 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 
 ## En attendant les échantillons d'alertes (ordre recommandé)
 
-1. [~] **Référentiel Recherche d'entreprises** : client HTTP, DTO et commande d'exploration `app:referential:search` faits (lecture seule). Reste : décider quoi créer en base (zone, effectif, NAF) puis rapprocher les 28 entreprises importées (`siren`, `nafCode`, `headcountRange`) ; resservira à l'étape 5.
+1. [x] **Référentiel Recherche d'entreprises** : client, DTO, `app:referential:search` (exploration) et `app:referential:import` (création + rapprochement du tableur, `--dry-run`). **Import réel lancé le 2026-10-13** (agglomération de Besançon, effectif ≥ 1, 10 codes NAF) : 135 créées, 12 rapprochées, soit 163 entreprises en base dont 16 du tableur sans SIREN (nom commercial ≠ dénomination légale, ou hors agglomération : Atol CD, Tête de com, Facton à Lure…). Reste : les rapprocher à part ; la taille servira au scoring (étape 5).
 2. [ ] **Lecteur IMAP générique** : lecture de la boîte, filtre expéditeur, marquage des mails traités, corps brut ; testable sans parseur.
 3. [ ] **Socle du pipeline** : `SignalSourceInterface`, `RawSignal`, `ScoringRuleInterface`, `IngestSignal` (dédup par `fingerprint`). À faire après au moins un vrai mail, pour que `RawSignal` reflète les alertes.
 4. [ ] **Règles éliminatoires** (stack, type d'entreprise, présentiel hors région) : attend la décision sur le filtre par stack.
