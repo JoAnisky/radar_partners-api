@@ -33,7 +33,7 @@ interface ScoringRuleInterface
 }
 ```
 
-- Implémenté : `src/Signal/` (`RawSignal`, `SignalSourceInterface` taguée `app.signal_source`, `StackFilter`) et `src/Signal/FreeWork/`.
+- Implémenté : `src/Signal/` (`RawSignal`, `SignalSourceInterface` taguée `app.signal_source`, `StackFilter`, `SignalIngester`) et `src/Signal/FreeWork/`. `app:signals:ingest` remplace pour l'instant le message Messenger `IngestSignal` (appel synchrone).
 - Une source = une classe qui implémente `SignalSourceInterface`, taguée automatiquement (`#[AutoconfigureTag]`). Ajouter une source ne modifie pas le pipeline.
 - Même principe pour les enrichers et les règles de scoring.
 - Chaque `ScoreContribution` porte un libellé : le score doit toujours être explicable.

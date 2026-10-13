@@ -73,6 +73,6 @@ CGU lues le 2026-10-13 (version du 14/09/2026, lecture automatisée à confirmer
 
 ## Prochaines étapes
 
-1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Reste le marquage des mails traités (déplacement vers un dossier « Traités »), à faire avec le pipeline.
+1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Marquage des mails traités non implémenté : la déduplication par `fingerprint` suffit (`app:signals:ingest` relit les mails depuis `--since`).
 2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work fait (`src/Signal/FreeWork/`) ; aperçu avec `app:signals:preview` (rien n'est enregistré).
-3. Faire : `IngestSignal` (persistance, déduplication par `fingerprint`, marquage des mails traités) ; parseurs LinkedIn et Indeed dès les premiers vrais mails d'offres. Offres sans entreprise : résolution manuelle (décidé).
+3. Fait : `app:signals:ingest` (filtre de stack, déduplication, enregistrement). Reste : parseurs LinkedIn et Indeed dès les premiers vrais mails d'offres. Offres sans entreprise : résolution manuelle (décidé).
