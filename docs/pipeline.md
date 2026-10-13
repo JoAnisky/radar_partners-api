@@ -33,6 +33,7 @@ interface ScoringRuleInterface
 }
 ```
 
+- Implémenté : `src/Signal/` (`RawSignal`, `SignalSourceInterface` taguée `app.signal_source`, `StackFilter`) et `src/Signal/FreeWork/`.
 - Une source = une classe qui implémente `SignalSourceInterface`, taguée automatiquement (`#[AutoconfigureTag]`). Ajouter une source ne modifie pas le pipeline.
 - Même principe pour les enrichers et les règles de scoring.
 - Chaque `ScoreContribution` porte un libellé : le score doit toujours être explicable.

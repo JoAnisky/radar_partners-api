@@ -33,14 +33,14 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 
 1. [x] **Référentiel Recherche d'entreprises** : client, DTO, `app:referential:search` (exploration) et `app:referential:import` (création + rapprochement du tableur, `--dry-run`). **Import réel lancé le 2026-10-13** (agglomération de Besançon, effectif ≥ 1, 10 codes NAF) : 135 créées, 12 rapprochées, soit 163 entreprises en base dont 16 du tableur sans SIREN (nom commercial ≠ dénomination légale, ou hors agglomération : Atol CD, Tête de com, Facton à Lure…). Reste : les rapprocher à part ; la taille servira au scoring (étape 5).
 2. [x] **Lecteur IMAP générique** : `ImapMailbox` (lecture seule, mails non lus), `RawEmail`, expéditeur d'origine des transferts manuels, `app:mailbox:list` et `app:mailbox:export`. Reste le marquage « traité » (avec le pipeline). Échantillons Free-Work et LinkedIn analysés : voir `docs/sources.md`.
-3. [ ] **Socle du pipeline** : `SignalSourceInterface`, `RawSignal`, `ScoringRuleInterface`, `IngestSignal` (dédup par `fingerprint`). À faire après au moins un vrai mail, pour que `RawSignal` reflète les alertes.
-4. [ ] **Règles éliminatoires** (stack, type d'entreprise, présentiel hors région) : attend la décision sur le filtre par stack.
+3. [~] **Socle du pipeline** : `RawSignal`, `SignalSourceInterface` (tag automatique), `FreeWorkAlertParser` + `FreeWorkEmailSource`, `StackFilter`, `app:signals:preview` faits et testés sur un vrai mail. Reste `IngestSignal` (persistance, dédup par `fingerprint`, marquage des mails traités) puis les parseurs LinkedIn et Indeed.
+4. [~] **Règles éliminatoires** : filtre de stack fait (titre, mots-clés dans `app.stack_keywords`). Restent type d'entreprise et présentiel hors région.
 5. [ ] **Petites dettes** : config PHPStan pour les faux positifs `$id`, fixtures Faker pour la démo.
 
 ## À faire / points ouverts
 
 - **Sourcing** : recevoir les premiers mails d'alerte (Free-Work, LinkedIn), les transférer en `.eml` dans `var/import/samples/`, puis écrire lecteur IMAP et parseurs.
-- **Décision en attente** : règle de filtrage par stack (un signal sans mot-clé de la stack n'est pas retenu) et sa liste de mots-clés, voir `docs/sources.md`. Décidé : offres Free-Work sans entreprise résolues à la main depuis le dashboard.
+- Décidé : offres Free-Work sans entreprise résolues à la main depuis le dashboard ; filtre de stack sur le titre (voir `docs/sources.md`).
 - Délai de relance `P6M` (`app.recontact_delay`) choisi par défaut : à ajuster.
 - PHPStan niveau max : faux positifs `property.unusedType` sur `$id` des entités (config Doctrine à ajouter).
 - Vérifier les noms de paramètres de l'API Recherche d'entreprises (documentation officielle illisible par outil).

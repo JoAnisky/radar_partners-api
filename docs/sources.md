@@ -35,9 +35,9 @@
 | **Apify** | Piste après l'IMAP : détection de stack (`Enricher`) sur les sites connus ; offres WTTJ éventuelles après vérification des CGU. Actors communautaires, responsabilité de l'usage à l'utilisateur. Plan gratuit 5 $/mois. |
 | Pages carrières des entreprises connues | Idée, CGU et `robots.txt` à vérifier au cas par cas. |
 
-## Règle de filtrage à valider
+## Filtre de stack (décidé le 2026-10-13)
 
-Un signal sans aucun mot-clé de la stack (Symfony, PHP, WordPress, Nuxt, Vue, Docker, K3s, DevOps… liste configurable) n'est pas retenu : ni signal, ni `Company` créée. Évite que le bruit des alertes pollue la base (scope national : une entreprise n'existe que si un signal pertinent la fait apparaître). **Proposé, pas encore décidé.**
+Un signal n'est retenu que si son **titre** contient un mot entier de la liste `app.stack_keywords` (`config/services.yaml`) : symfony, php, laravel, wordpress, vue, nuxt, docker, kubernetes, k3s, devops. Implémenté dans `StackFilter`. « fullstack » seul ne qualifie pas (les offres fullstack reçues étaient Java/.NET/Angular) ; React n'est pas dans la liste. La catégorie de l'URL Free-Work est ignorée : elle regroupe plusieurs technos (`…react-angular-vue`). Sur l'échantillon du 2026-10-13 : 1 offre retenue sur 10.
 
 ## Structure des alertes (échantillons du 2026-10-13)
 
@@ -74,5 +74,5 @@ CGU lues le 2026-10-13 (version du 14/09/2026, lecture automatisée à confirmer
 ## Prochaines étapes
 
 1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Reste le marquage des mails traités (déplacement vers un dossier « Traités »), à faire avec le pipeline.
-2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work d'abord (échantillon réel disponible), LinkedIn dès qu'un vrai mail d'offres arrive (+ Indeed demain).
-3. Décider : règle de filtrage par stack (liste de mots-clés). Offres sans entreprise : résolution manuelle (décidé).
+2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work fait (`src/Signal/FreeWork/`) ; aperçu avec `app:signals:preview` (rien n'est enregistré).
+3. Faire : `IngestSignal` (persistance, déduplication par `fingerprint`, marquage des mails traités) ; parseurs LinkedIn et Indeed dès les premiers vrais mails d'offres. Offres sans entreprise : résolution manuelle (décidé).
