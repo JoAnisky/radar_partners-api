@@ -32,7 +32,7 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 ## Dashboard (étape 6) : première tranche
 
 - [x] **API de lecture** : `GET /api/companies` (filtres, tri, pagination, recherche sans accent) et `GET /api/companies/{id}` (contacts, interactions, signaux), CORS, 91 tests dont des tests sur base `radar_test`. Voir `docs/api.md`.
-- [ ] **API d'écriture** : saisie d'une interaction (met à jour le statut via `PipelineStatusResolver`), modification du statut et des notes, archivage ; liste des signaux sans entreprise et rattachement à une entreprise.
+- [x] **API d'écriture** : création d'entreprise, modification partielle (statut, notes, flags, archivage), saisie d'interaction (statut mis à jour sans écraser un statut manuel), liste des signaux et rattachement à une entreprise. 122 tests. Voir `docs/api.md`.
 - [ ] **Front Nuxt** avec Nuxt UI : liste (onglet « À relancer »), fiche entreprise, formulaire d'interaction, page des signaux sans entreprise.
 - [ ] Authentification avant toute exposition (prod ou démo).
 

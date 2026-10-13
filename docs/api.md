@@ -2,7 +2,7 @@
 
 > Contrôleurs dans `src/Controller/Api/`, format de réponse dans `src/Api/`. URL de dev : `http://radarpartners.api.dev.local`. Pas d'authentification pour l'instant (local uniquement) : à ajouter avant toute exposition.
 
-## Endpoints (lecture seule)
+## Endpoints
 
 ### `GET /api/companies`
 
@@ -25,8 +25,33 @@ Paramètre invalide : `422`.
 
 Résumé + `address`, `email`, `parentId`, `scoreExplanation`, `notes`, `createdAt`, `contacts[]`, `interactions[]` (plus récente d'abord), `signals[]`. `404` si inconnue.
 
+### `POST /api/companies`
+
+Crée une entreprise : `name` (obligatoire), `scope` (défaut `NATIONAL`), `type` (défaut `UNKNOWN`), `website`, `city`, `notes`. `201` avec la fiche ; `409` + `id` de l'existante si un nom identique (sans casse) existe, archivée ou non ; `422` si invalide.
+
+### `PATCH /api/companies/{id}`
+
+Modification partielle : seuls les champs présents sont touchés. Champs : `status`, `type`, `scope`, `notes` (`null` pour vider), `recontactAfter` (date ou `null`), `flags` (liste de `MAJUSCULES_`), `archived` (booléen). Champ inconnu ou valeur invalide : `422`. Renvoie la fiche.
+
+Règle : un changement de `status` vers `ON_HOLD` sans `recontactAfter` fixe la date à maintenant + `app.recontact_delay` ; vers un autre statut, la date est effacée.
+
+### `POST /api/companies/{id}/interactions`
+
+Saisie d'une interaction : `channel` (obligatoire), `occurredAt` (défaut maintenant), `outcome` (défaut `OTHER`), `contactId` (doit appartenir à l'entreprise), `origin`, `notes`, `nextActionAt`. `201` avec `{ interaction, company }` (résumé à jour).
+
+Règle de statut (`PipelineStatusResolver::register`) : seule une interaction **significative et la plus récente** change le statut (et la date de relance) ; sinon un statut posé à la main est conservé, sauf `TO_CONTACT` qui passe à `CONTACTED`.
+
+### `GET /api/signals`
+
+Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `page`, `perPage`. Chaque item porte `companyId` et `companyName`.
+
+### `PATCH /api/signals/{id}`
+
+`{"companyId": 12}` rattache, `{"companyId": null}` détache ; rien d'autre n'est accepté. Règle : rattacher une offre (`JOB_POSTING` ou `FREELANCE_MISSION`) à une entreprise `ON_HOLD` met sa date de relance à maintenant : elle remonte dans « à relancer ».
+
 ## Décisions techniques
 
+- Pas d'authentification pour l'instant ; aucun endpoint de suppression (soft delete par `archived`).
 - Réponses construites à la main (`CompanyPresenter`), pas de sérialisation d'entités : contrôle de ce qui sort.
 - Paramètres de liste mappés par `#[MapQueryString]` (`CompanyListQuery`) avec validation.
 - CORS (`nelmio/cors-bundle`) limité à `/api/`, origines via `CORS_ALLOW_ORIGIN` (`radarpartners.dev.local` et localhost).
