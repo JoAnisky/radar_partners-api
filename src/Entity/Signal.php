@@ -156,4 +156,11 @@ class Signal
     {
         return $this->detectedAt;
     }
+
+    public function setDetectedAt(\DateTimeImmutable $detectedAt): static
+    {
+        $this->detectedAt = $detectedAt;
+
+        return $this;
+    }
 }
