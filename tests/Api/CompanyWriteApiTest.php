@@ -120,4 +120,81 @@ final class CompanyWriteApiTest extends ApiTestCase
     {
         self::assertSame(404, $this->request('PATCH', '/api/companies/999999', ['notes' => 'x'])[0]);
     }
+
+    public function testPatchEditsIdentityFields(): void
+    {
+        $company = $this->company('Acme');
+
+        [$status, $body] = $this->request('PATCH', '/api/companies/'.$company->getId(), [
+            'name' => '  Acme Studio ',
+            'website' => 'acme.test',
+            'address' => '12 rue des Lilas',
+            'postalCode' => '25000',
+            'city' => 'Besançon',
+            'phone' => '06 12 34 56 78',
+            'email' => 'Contact@Acme.TEST',
+            'siren' => '123 456 789',
+            'nafCode' => '62.01z',
+            'headcountRange' => '10-19',
+        ]);
+
+        self::assertSame(200, $status);
+        self::assertSame('Acme Studio', self::at($body, 'name'));
+        self::assertSame('https://acme.test', self::at($body, 'website'));
+        self::assertSame('12 rue des Lilas', self::at($body, 'address'));
+        self::assertSame('Besançon', self::at($body, 'city'));
+        self::assertSame('+33612345678', self::at($body, 'phone'));
+        self::assertSame('contact@acme.test', self::at($body, 'email'));
+        self::assertSame('123456789', self::at($body, 'siren'));
+        self::assertSame('62.01Z', self::at($body, 'nafCode'));
+        self::assertSame('10-19', self::at($body, 'headcountRange'));
+    }
+
+    public function testPatchClearsIdentityFieldsWithNullOrEmpty(): void
+    {
+        $company = $this->company('Acme', 'Lure')->setWebsite('https://acme.test')->setEmail('a@acme.test')->setSiren('123456789');
+        $this->em->flush();
+
+        [, $body] = $this->request('PATCH', '/api/companies/'.$company->getId(), ['website' => null, 'city' => '', 'email' => '  ', 'siren' => null]);
+
+        self::assertNull(self::at($body, 'website'));
+        self::assertNull(self::at($body, 'city'));
+        self::assertNull(self::at($body, 'email'));
+        self::assertNull(self::at($body, 'siren'));
+    }
+
+    public function testPatchRenameKeepsOwnNameAcceptsCaseChange(): void
+    {
+        $company = $this->company('acme');
+
+        self::assertSame(200, $this->request('PATCH', '/api/companies/'.$company->getId(), ['name' => 'Acme'])[0]);
+    }
+
+    public function testPatchRejectsNameOrSirenUsedByAnotherCompany(): void
+    {
+        $this->company('Taken')->setSiren('111111111');
+        $this->em->flush();
+        $uri = '/api/companies/'.$this->company('Acme')->getId();
+
+        self::assertSame(409, $this->request('PATCH', $uri, ['name' => 'TAKEN'])[0]);
+        self::assertSame(409, $this->request('PATCH', $uri, ['siren' => '111111111'])[0]);
+    }
+
+    public function testPatchRejectsInvalidIdentityValues(): void
+    {
+        $uri = '/api/companies/'.$this->company('Acme')->getId();
+
+        foreach ([
+            ['name' => '   '],
+            ['name' => null],
+            ['phone' => '12'],
+            ['email' => 'not-an-email'],
+            ['siren' => '12345'],
+            ['nafCode' => '6201Z'],
+            ['postalCode' => '01234567890'],
+            ['city' => 42],
+        ] as $payload) {
+            self::assertSame(422, $this->request('PATCH', $uri, $payload)[0], (string) json_encode($payload));
+        }
+    }
 }

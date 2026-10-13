@@ -30,7 +30,9 @@ final class Payload
             throw new UnprocessableEntityHttpException(sprintf('%s doit être un texte de %d caractères maximum.', $field, $max));
         }
 
-        return '' === trim($value) ? null : $value;
+        $trimmed = trim($value);
+
+        return '' === $trimmed ? null : $trimmed;
     }
 
     public static function date(mixed $value, string $field): \DateTimeImmutable
