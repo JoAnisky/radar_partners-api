@@ -39,6 +39,24 @@
 
 Un signal sans aucun mot-clé de la stack (Symfony, PHP, WordPress, Nuxt, Vue, Docker, K3s, DevOps… liste configurable) n'est pas retenu : ni signal, ni `Company` créée. Évite que le bruit des alertes pollue la base (scope national : une entreprise n'existe que si un signal pertinent la fait apparaître). **Proposé, pas encore décidé.**
 
+## Structure des alertes (échantillons du 2026-10-13)
+
+Échantillons dans `var/import/samples/` (ignoré par git ; obtenus avec `app:mailbox:export`).
+
+- **Free-Work** (`jobs@free-work.com`, « N offres matchant avec vos critères », 1 mail/jour) :
+  - HTML régulier : `<li><a href="lien tracké"><b>Titre - <span>Contrat</span></b><br>durée [- salaire] [- TJM] - Ville, Région</a></li>`.
+  - **Aucun nom d'entreprise** dans le mail.
+  - Le dernier segment du lien tracké `mjt.lu` est l'URL de l'offre en base64 (décodable sans réseau) : `https://www.free-work.com/fr/tech-it/job-mission/<catégorie>/<slug>?utm…`. Le slug identifie l'offre (fingerprint) ; la catégorie (`developpeur-java-kotlin-groovy-scala`…) donne un indice de stack.
+  - Les 13 offres reçues étaient toutes hors stack (.NET, Java, Angular, Python, Go) : le filtre par stack est indispensable.
+- **LinkedIn** (`jobalerts-noreply@linkedin.com`) : seul le mail « votre alerte a été créée » est reçu pour l'instant ; il liste des offres avec **le nom de l'entreprise** (« Entreprise · Lieu »), titre et lien. Les alertes réelles auront probablement la même mise en page (à confirmer). Ce mail de confirmation n'est pas une alerte d'offres : à ignorer (objet « a été créée »).
+- **Transfert manuel** : l'expéditeur visible est celui qui transfère ; l'expéditeur d'origine est lu dans le bandeau « Forwarded message » (`RawEmail::isFrom()`). Le comportement des règles de transfert automatiques reste à confirmer.
+
+### Conséquence : l'entreprise n'est pas toujours connue
+
+Free-Work ne donne pas l'entreprise : `Signal.company` reste nul. **Décision (2026-10-13) : résolution manuelle** — le dashboard affiche le lien de l'offre, l'utilisateur saisit l'entreprise pour les offres qui l'intéressent. Pas de requête automatique vers Free-Work pour l'instant.
+
+CGU lues le 2026-10-13 (version du 14/09/2026, lecture automatisée à confirmer) : aucune clause sur le scraping ; art. 7.3 interdit l'extraction d'une part substantielle de la base de données et « l'exploitation professionnelle ou commerciale » du site (point flou) ; `robots.txt` n'interdit pas les pages d'offres mais bloque Wget, HTTrack et plusieurs crawlers. Si on automatise plus tard : écrire d'abord à Free-Work (tolérance ? API ?), pages publiques seulement (vérifier hors connexion), uniquement les offres filtrées, une requête toutes les quelques secondes, cache, User-Agent honnête.
+
 ## Contraintes de conception (alertes mail)
 
 - Deux alertes qui se chevauchent : dédupliquer par **identité de l'offre** (ex. identifiant d'offre dans l'URL, à confirmer sur un échantillon), pas par `Message-ID`.
@@ -55,7 +73,6 @@ Un signal sans aucun mot-clé de la stack (Symfony, PHP, WordPress, Nuxt, Vue, D
 
 ## Prochaines étapes
 
-1. Recevoir des alertes réelles ; les transférer **en pièce jointe** (`.eml`, en-têtes conservés) vers la boîte dédiée, puis les déposer dans `var/import/samples/` (ignoré par git).
-2. Lecteur IMAP générique : filtre expéditeur, déduplication par `Message-ID`, marquage des mails traités.
-3. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt).
-4. Décider la règle de filtrage par stack.
+1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Reste le marquage des mails traités (déplacement vers un dossier « Traités »), à faire avec le pipeline.
+2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work d'abord (échantillon réel disponible), LinkedIn dès qu'un vrai mail d'offres arrive (+ Indeed demain).
+3. Décider : règle de filtrage par stack (liste de mots-clés). Offres sans entreprise : résolution manuelle (décidé).
