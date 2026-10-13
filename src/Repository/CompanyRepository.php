@@ -17,6 +17,19 @@ class CompanyRepository extends ServiceEntityRepository
         parent::__construct($registry, Company::class);
     }
 
+    public function findOneByName(string $name): ?Company
+    {
+        /** @var Company|null $company */
+        $company = $this->createQueryBuilder('c')
+            ->where('LOWER(c.name) = :name')
+            ->setParameter('name', mb_strtolower(trim($name)))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $company;
+    }
+
     /** @return array{items: list<Company>, total: int} */
     public function search(CompanyListQuery $query, \DateTimeImmutable $now): array
     {

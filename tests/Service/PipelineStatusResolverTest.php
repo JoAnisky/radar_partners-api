@@ -62,4 +62,54 @@ final class PipelineStatusResolverTest extends TestCase
         self::assertSame(PipelineStatus::Meeting, $company->getStatus());
         self::assertNull($company->getRecontactAfter());
     }
+
+    public function testRegisterAppliesALatestSignificantInteraction(): void
+    {
+        $company = new Company('Acme');
+        $previous = [$this->interaction($company, '2026-09-01', InteractionOutcome::NoAnswer)];
+        $new = $this->interaction($company, '2026-10-01', InteractionOutcome::JustHired);
+
+        (new PipelineStatusResolver('P6M'))->register($company, $new, $previous);
+
+        self::assertSame(PipelineStatus::OnHold, $company->getStatus());
+        self::assertSame('2027-04-01', $company->getRecontactAfter()?->format('Y-m-d'));
+    }
+
+    public function testRegisterKeepsAManualStatusForNonSignificantInteraction(): void
+    {
+        $company = (new Company('Acme'))->setStatus(PipelineStatus::Partner);
+
+        (new PipelineStatusResolver('P6M'))->register($company, $this->interaction($company, '2026-10-01', InteractionOutcome::Voicemail), []);
+
+        self::assertSame(PipelineStatus::Partner, $company->getStatus());
+    }
+
+    public function testRegisterMovesToContactedOnlyFromToContact(): void
+    {
+        $company = new Company('Acme');
+
+        (new PipelineStatusResolver('P6M'))->register($company, $this->interaction($company, '2026-10-01', InteractionOutcome::Voicemail), []);
+
+        self::assertSame(PipelineStatus::Contacted, $company->getStatus());
+    }
+
+    public function testRegisterIgnoresSignificantInteractionOlderThanExistingOnes(): void
+    {
+        $company = (new Company('Acme'))->setStatus(PipelineStatus::Meeting);
+        $previous = [$this->interaction($company, '2026-10-10', InteractionOutcome::MeetingScheduled)];
+
+        (new PipelineStatusResolver('P6M'))->register($company, $this->interaction($company, '2026-09-01', InteractionOutcome::NoFreelancePolicy), $previous);
+
+        self::assertSame(PipelineStatus::Meeting, $company->getStatus());
+    }
+
+    public function testRegisterClearsRecontactDateWhenLeavingOnHold(): void
+    {
+        $company = (new Company('Acme'))->setStatus(PipelineStatus::OnHold)->setRecontactAfter(new \DateTimeImmutable('2027-01-01'));
+
+        (new PipelineStatusResolver('P6M'))->register($company, $this->interaction($company, '2026-10-01', InteractionOutcome::Positive), []);
+
+        self::assertSame(PipelineStatus::FollowUp, $company->getStatus());
+        self::assertNull($company->getRecontactAfter());
+    }
 }

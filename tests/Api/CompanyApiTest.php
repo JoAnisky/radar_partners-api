@@ -2,79 +2,11 @@
 
 namespace App\Tests\Api;
 
-use App\Entity\Company;
 use App\Entity\Contact;
-use App\Entity\Interaction;
-use App\Enum\InteractionChannel;
-use App\Enum\InteractionOutcome;
 use App\Enum\PipelineStatus;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
-final class CompanyApiTest extends KernelTestCase
+final class CompanyApiTest extends ApiTestCase
 {
-    private EntityManagerInterface $em;
-
-    protected function setUp(): void
-    {
-        self::bootKernel();
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($em instanceof EntityManagerInterface);
-        $this->em = $em;
-        $this->em->getConnection()->beginTransaction();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->em->getConnection()->rollBack();
-        parent::tearDown();
-    }
-
-    private function company(string $name, ?string $city = null): Company
-    {
-        $company = (new Company($name))->setCity($city);
-        $this->em->persist($company);
-        $this->em->flush();
-
-        return $company;
-    }
-
-    private function interaction(Company $company, string $date, ?string $nextAction = null): Interaction
-    {
-        $interaction = (new Interaction($company, InteractionChannel::Phone, new \DateTimeImmutable($date)))
-            ->setOutcome(InteractionOutcome::NoAnswer)
-            ->setNextActionAt(null === $nextAction ? null : new \DateTimeImmutable($nextAction));
-        $this->em->persist($interaction);
-        $this->em->flush();
-
-        return $interaction;
-    }
-
-    /** @return array{int, array<string, mixed>} */
-    private function get(string $uri): array
-    {
-        \assert(null !== self::$kernel);
-        $response = self::$kernel->handle(Request::create($uri, server: ['HTTP_ACCEPT' => 'application/json']));
-        /** @var array<string, mixed> $body */
-        $body = json_decode((string) $response->getContent(), true) ?: [];
-
-        return [$response->getStatusCode(), $body];
-    }
-
-    /**
-     * @param array<string, mixed> $body
-     *
-     * @return list<string>
-     */
-    private static function names(array $body): array
-    {
-        /** @var list<array{name: string}> $items */
-        $items = $body['items'];
-
-        return array_map(static fn (array $item): string => $item['name'], $items);
-    }
-
     public function testListIsPaginatedAndSortedByName(): void
     {
         foreach (['Charlie', 'Alpha', 'Bravo'] as $name) {
@@ -84,7 +16,7 @@ final class CompanyApiTest extends KernelTestCase
         [$status, $body] = $this->get('/api/companies?perPage=2');
 
         self::assertSame(200, $status);
-        self::assertSame(3, $body['total']);
+        self::assertSame(3, self::at($body, 'total'));
         self::assertSame(['Alpha', 'Bravo'], self::names($body));
         self::assertSame(['Charlie'], self::names($this->get('/api/companies?perPage=2&page=2')[1]));
     }
@@ -164,12 +96,12 @@ final class CompanyApiTest extends KernelTestCase
         $body = $raw;
 
         self::assertSame(200, $status);
-        self::assertSame('Acme', $body['name']);
-        self::assertSame('Jane Doe', $body['contacts'][0]['fullName']);
-        self::assertCount(2, $body['interactions']);
-        self::assertGreaterThan($body['interactions'][1]['occurredAt'], $body['interactions'][0]['occurredAt']);
-        self::assertSame($body['interactions'][0]['occurredAt'], $body['lastInteractionAt']);
-        self::assertSame([], $body['signals']);
+        self::assertSame('Acme', self::at($body, 'name'));
+        self::assertSame('Jane Doe', self::at($body, 'contacts.0.fullName'));
+        self::assertCount(2, self::arr($body, 'interactions'));
+        self::assertGreaterThan(self::at($body, 'interactions.1.occurredAt'), self::at($body, 'interactions.0.occurredAt'));
+        self::assertSame(self::at($body, 'interactions.0.occurredAt'), self::at($body, 'lastInteractionAt'));
+        self::assertSame([], self::at($body, 'signals'));
     }
 
     public function testShowUnknownCompanyIsNotFound(): void

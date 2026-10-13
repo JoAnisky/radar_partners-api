@@ -69,7 +69,7 @@ final class CompanyPresenter
     }
 
     /** @return array<string, mixed> */
-    private function interaction(Interaction $interaction): array
+    public function interaction(Interaction $interaction): array
     {
         return [
             'id' => $interaction->getId(),
@@ -84,10 +84,12 @@ final class CompanyPresenter
     }
 
     /** @return array<string, mixed> */
-    private function signal(Signal $signal): array
+    public function signal(Signal $signal): array
     {
         return [
             'id' => $signal->getId(),
+            'companyId' => $signal->getCompany()?->getId(),
+            'companyName' => $signal->getCompany()?->getName(),
             'type' => $signal->getType()->value,
             'source' => $signal->getSource(),
             'title' => $signal->getTitle(),
