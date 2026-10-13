@@ -8,6 +8,10 @@
 - **Nuxt UI v4** (Tailwind 4) : composants `UTable`, `USelect`, `UCard`, `UBadge`… ; `UApp` à la racine pour les toasts. CSS : `app/assets/css/main.css`.
 - Client HTTP : `useApi()` (`$fetch.create` avec la `baseURL` de la config publique). Types de l'API : `app/types/api.ts`. Libellés français et couleurs de statut : `app/utils/labels.ts`.
 
+## Piège : HMR derrière Traefik
+
+Par défaut `nuxt dev` fait tourner l'application dans un processus enfant derrière un processus parent qui relaie les requêtes ; ce relais coupe la WebSocket de Vite (`ECONNRESET`, erreur « WebSocket connection to ws://radarpartners.dev.local/_nuxt/ failed » dans la console). La commande du conteneur utilise donc `nuxt dev --host 0.0.0.0 --no-fork` (`front/.docker/Dockerfile`). Test : une requête d'upgrade WebSocket sur `/_nuxt/?token=…` doit répondre 101, y compris via Traefik.
+
 ## Pages et composants
 
 | Fichier | Rôle |
