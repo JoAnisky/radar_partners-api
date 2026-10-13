@@ -67,6 +67,10 @@ Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `pag
 
 `{"companyId": 12}` rattache, `{"companyId": null}` détache ; rien d'autre n'est accepté. Règle : rattacher une offre (`JOB_POSTING` ou `FREELANCE_MISSION`) à une entreprise `ON_HOLD` met sa date de relance à maintenant : elle remonte dans « à relancer ».
 
+## Score
+
+`score` (0–100) figure dans les résumés et `scoreExplanation` (lignes « +20 Agence web », …, « Total : 40 ») dans la fiche. Il est recalculé après chaque écriture qui le touche ; le tri `sort=score` fonctionne sur `GET /api/companies`. Règles et poids : `docs/pipeline.md`.
+
 ## Décisions techniques
 
 - Pas d'authentification pour l'instant ; seule suppression : les contacts (RGPD). Entreprises : soft delete (`archived`) ; interactions : modification seulement (l'historique est conservé).

@@ -16,14 +16,14 @@ Par défaut `nuxt dev` fait tourner l'application dans un processus enfant derri
 
 | Fichier | Rôle |
 |---|---|
-| `pages/index.vue` | Liste des entreprises : recherche, filtre de statut, tri, « À relancer », pagination |
+| `pages/index.vue` | Liste des entreprises triée par score par défaut : recherche, filtre de statut, tri, « À relancer », pagination |
 | `pages/companies/[id].vue` | Fiche : infos, statut modifiable, archivage, notes, contacts, historique, signaux |
 | `pages/contacts.vue` | Onglet Contacts : tous les contacts avec leur entreprise (liens vers la fiche), recherche, tri, pagination |
 | `components/ContactForm.vue` | Ajout et modification d'un contact ; ajout, modification et suppression (avec confirmation) depuis la carte Contacts |
 | `components/CompanyForm.vue` | Modification des informations d'une entreprise (bouton « Modifier » de la carte Informations) ; n'envoie que les champs changés |
 | `components/InteractionForm.vue` | Saisie ou modification d'une interaction (bouton « Modifier » dans l'historique) ; les dates inchangées ne sont pas renvoyées |
 | `pages/signals.vue` + `components/SignalAttach.vue` | Offres sans entreprise : recherche d'une entreprise et rattachement, ou création |
-| `components/StatusBadge.vue` | Badge de statut |
+| `components/StatusBadge.vue`, `components/ScoreBadge.vue` | Badges de statut et de score (couleur selon le niveau) ; la fiche affiche le détail du score |
 
 ## Vérifications
 

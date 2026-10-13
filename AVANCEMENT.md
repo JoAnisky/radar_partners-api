@@ -29,6 +29,12 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 - Boîte IMAP : Gmail dédié + mot de passe d'application (Outlook.com OAuth seul, Proton Bridge payant, `contact@` à éviter).
 - Ordre des sources : référentiel Recherche d'entreprises et IMAP d'abord ; Apify, Welcome to the Jungle, HelloWork ensuite (voir `docs/sources.md`).
 
+## Étape 5 : scoring
+
+- [x] **Score explicable** : 9 règles (`src/Scoring/`), explication enregistrée, recalcul à chaque écriture et par `app:score:recompute` ; affiché dans la liste (tri par défaut) et la fiche. 203 tests. Voir `docs/pipeline.md`.
+- [ ] **Résolution d'entreprise** (`ResolveCompany`) pour les signaux avec un nom d'entreprise (LinkedIn) ; Free-Work reste manuel.
+- [ ] Ajuster les poids après quelques semaines d'usage ; règles « modalité » et « urgence » à ajouter.
+
 ## Dashboard (étape 6) : première tranche
 
 - [x] **API de lecture** : `GET /api/companies` (filtres, tri, pagination, recherche sans accent) et `GET /api/companies/{id}` (contacts, interactions, signaux), CORS, 91 tests dont des tests sur base `radar_test`. Voir `docs/api.md`.
