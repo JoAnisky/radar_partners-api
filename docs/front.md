@@ -27,10 +27,24 @@ Par défaut `nuxt dev` fait tourner l'application dans un processus enfant derri
 
 ## Vérifications
 
-- Types : `docker exec radarpartners-front npx vue-tsc --noEmit` (TypeScript **5** : `vue-tsc` ne supporte pas encore TypeScript 7).
-- Pas encore de tests ni d'ESLint ; l'interface n'a pas été vérifiée visuellement (aucun navigateur côté outils de développement).
+À lancer dans le conteneur (`docker exec radarpartners-front npm run …`) :
+
+| Commande | Rôle |
+|---|---|
+| `lint` / `lint:fix` | ESLint (`@nuxt/eslint`, style Stylistic : 2 espaces, sans point-virgule, apostrophes simples) |
+| `typecheck` | `nuxt typecheck`. **Pas `vue-tsc --noEmit` seul** : le `tsconfig.json` de Nuxt a `files: []` et des références, `vue-tsc` n'y analyse alors aucun fichier. TypeScript reste en **5** (`vue-tsc` ne supporte pas encore TypeScript 7). |
+| `test` | Vitest 5 : projet `unit` (fonctions pures, `test/unit/`) et projet `nuxt` (composants et pages montés dans l'environnement Nuxt, `test/nuxt/`) |
+
+### Tests
+
+- **Formulaires** (`InteractionForm`, `CompanyForm`, `ContactForm`, `SignalAttach`) : `useApi` est simulé (`mockNuxtImport`) et on vérifie ce qui est envoyé à l'API : seuls les champs modifiés, `null` pour un champ vidé, dates inchangées omises, refus d'un contact sans nom, annulation sans appel.
+- **Pages** (liste, contacts, signaux, fiche) : `useApi` renvoie `$fetch` et les endpoints sont simulés (`registerEndpoint`) : rendu des données, paramètres envoyés (tri par score par défaut, recherche avec délai, « À relancer »), ouverture des formulaires, confirmation de suppression.
+- Pièges : l'application Nuxt est **partagée entre les tests** (`clearNuxtData()` avant chaque test, pages démontées après) ; `runtimeConfig.public.apiBaseUrl` vient du `.env` et n'est pas surchargeable pour les tests, d'où `useApi` simulé.
+- `vitest.config.ts` contient un petit plugin qui contourne un défaut de résolution de l'entrée virtuelle de `@nuxt/test-utils` avec Vite 8 (importeur vu comme `/node_modules/...`, imports relatifs introuvables) ; à retirer si une mise à jour de `@nuxt/test-utils` le corrige. Le fichier `.nuxtrc` est créé par l'assistant de `@nuxt/test-utils`.
+- Pas de test de bout en bout dans un vrai navigateur : l'affichage visuel reste à vérifier à l'œil.
 
 ## Points ouverts
 
 - `npm audit` : 15 alertes (2 critiques) toutes indirectes via `nuxt` (devtools, nitropack) ; le correctif proposé par npm est une rétrogradation en Nuxt 3, à ne pas faire. À suivre aux mises à jour de Nuxt.
 - Pas d'authentification ; pas de pagination de la page des signaux (50 premiers).
+- Une image `dark-mode-dashboards-apex-2.avif` traîne non suivie à la racine de `front/` (pas de moi) : à ranger ou supprimer.
