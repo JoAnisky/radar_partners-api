@@ -8,6 +8,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.recontact_delay: 'P6M'
+    app.stack_keywords: [symfony, php, laravel, wordpress, vue, nuxt, docker, kubernetes, k3s, devops]
 
 services:
     # default configuration for services in *this* file
