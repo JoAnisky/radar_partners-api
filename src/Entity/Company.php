@@ -369,4 +369,11 @@ class Company
 
         return $this;
     }
+
+    public function removeContact(Contact $contact): static
+    {
+        $this->contacts->removeElement($contact);
+
+        return $this;
+    }
 }

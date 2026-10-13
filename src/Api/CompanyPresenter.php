@@ -55,7 +55,23 @@ final class CompanyPresenter
     }
 
     /** @return array<string, mixed> */
-    private function contact(Contact $contact): array
+    public function contactListItem(Contact $contact, ?\DateTimeImmutable $lastInteractionAt): array
+    {
+        $company = $contact->getCompany();
+
+        return $this->contact($contact) + [
+            'company' => [
+                'id' => $company->getId(),
+                'name' => $company->getName(),
+                'city' => $company->getCity(),
+                'status' => $company->getStatus()->value,
+            ],
+            'lastInteractionAt' => self::date($lastInteractionAt),
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function contact(Contact $contact): array
     {
         return [
             'id' => $contact->getId(),
