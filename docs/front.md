@@ -18,7 +18,7 @@ Par défaut `nuxt dev` fait tourner l'application dans un processus enfant derri
 |---|---|
 | `pages/index.vue` | Liste des entreprises : recherche, filtre de statut, tri, « À relancer », pagination |
 | `pages/companies/[id].vue` | Fiche : infos, statut modifiable, archivage, notes, contacts, historique, signaux |
-| `components/InteractionForm.vue` | Saisie d'une interaction (met à jour le statut côté API) |
+| `components/InteractionForm.vue` | Saisie ou modification d'une interaction (bouton « Modifier » dans l'historique) ; les dates inchangées ne sont pas renvoyées |
 | `pages/signals.vue` + `components/SignalAttach.vue` | Offres sans entreprise : recherche d'une entreprise et rattachement, ou création |
 | `components/StatusBadge.vue` | Badge de statut |
 

@@ -41,6 +41,12 @@ Saisie d'une interaction : `channel` (obligatoire), `occurredAt` (défaut mainte
 
 Règle de statut (`PipelineStatusResolver::register`) : seule une interaction **significative et la plus récente** change le statut (et la date de relance) ; sinon un statut posé à la main est conservé, sauf `TO_CONTACT` qui passe à `CONTACTED`.
 
+### `PATCH /api/interactions/{id}`
+
+Modification partielle d'une interaction : `channel`, `occurredAt` (non nul), `outcome`, `contactId` (`null` pour détacher ; doit appartenir à l'entreprise), `origin`, `notes`, `nextActionAt` (`null` pour vider). Champ inconnu ou valeur invalide : `422`. Renvoie `{ interaction, company }`.
+
+Règle de statut (`PipelineStatusResolver::followEdit`) : si la date ou le résultat change, le statut est recalculé **seulement s'il suivait déjà la déduction faite sur l'ancien historique** (dernière interaction significative) ; un statut posé à la main est conservé, comme une date de relance modifiée à la main si rien ne change dans la déduction. Pas de suppression d'interaction (l'historique est conservé).
+
 ### `GET /api/signals`
 
 Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `page`, `perPage`. Chaque item porte `companyId` et `companyName`.
