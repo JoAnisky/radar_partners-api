@@ -33,8 +33,24 @@ services:
             - default
             - pgsql_network
 
+    radarpartners-llm:
+        image: ollama/ollama
+        container_name: radarpartners-llm
+        volumes:
+            - radarpartners_llm_data:/root/.ollama
+        networks:
+            - default
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities: [gpu]
+
 volumes:
     radarpartners_db_data:
+    radarpartners_llm_data:
 
 networks:
     web:
