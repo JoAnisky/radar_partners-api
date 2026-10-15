@@ -94,6 +94,25 @@ final class ChatToolsTest extends ApiTestCase
         self::assertNull($this->runTool(GetCompanyTool::class, ['name' => 'Futur'])['nextActionOverdueByDays']);
     }
 
+    public function testGetCompanyTellsWhetherDatesInNotesArePast(): void
+    {
+        $company = $this->company('Acme Studio')->setNotes('Salon le '.(new \DateTimeImmutable('+10 days'))->format('d/m/Y'));
+        $interaction = $this->interaction($company, '-30 days');
+        $interaction->setNotes('RDV le '.(new \DateTimeImmutable('-28 days'))->format('d.m.Y').' à 11h');
+        $this->em->flush();
+
+        $result = $this->runTool(GetCompanyTool::class, ['name' => 'Acme Studio']);
+
+        /** @var list<string> $alerts */
+        $alerts = $result['alerts'];
+        self::assertCount(1, $alerts);
+        self::assertStringContainsString('PASSÉE depuis 28 jour(s)', $alerts[0]);
+        self::assertSame('à venir, dans 10 jour(s)', self::rows($result, 'datesInCompanyNotes')[0]['when']);
+        /** @var list<array{when: string}> $first */
+        $first = self::rows($result, 'interactions')[0]['datesInNotes'];
+        self::assertSame('passée, il y a 28 jour(s)', $first[0]['when']);
+    }
+
     public function testListSignalsByView(): void
     {
         $this->signal('Dev PHP');

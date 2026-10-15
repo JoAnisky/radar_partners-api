@@ -9,6 +9,7 @@ use App\Entity\Interaction;
 use App\Repository\CompanyRepository;
 use App\Repository\InteractionRepository;
 use App\Repository\SignalRepository;
+use App\Util\NoteDateExtractor;
 
 final readonly class GetCompanyTool implements ChatToolInterface
 {
@@ -29,7 +30,7 @@ final readonly class GetCompanyTool implements ChatToolInterface
 
     public function getDescription(): string
     {
-        return "Donne la fiche complète d'une entreprise : informations, score expliqué, notes, contacts, dernières interactions (avec daysAgo, le nombre de jours écoulés) et offres rattachées, plus les retards déjà calculés (daysSinceLastInteraction, nextActionOverdueByDays, recontactOverdueByDays). Utile avant de rédiger un message.";
+        return "Donne la fiche complète d'une entreprise : informations, score expliqué, notes, contacts, dernières interactions (avec daysAgo, le nombre de jours écoulés) et offres rattachées, plus les retards déjà calculés (daysSinceLastInteraction, nextActionOverdueByDays, recontactOverdueByDays) les dates écrites dans les notes (datesInNotes, datesInCompanyNotes) avec leur position par rapport à aujourd'hui, et des alertes (alerts) à relayer à l'utilisateur. Utile avant de rédiger un message.";
     }
 
     public function getParameters(): array
@@ -61,11 +62,56 @@ final readonly class GetCompanyTool implements ChatToolInterface
         $detail['nextActionOverdueByDays'] = self::overdueDays($latest?->getNextActionAt(), $now);
         $detail['recontactOverdueByDays'] = self::overdueDays($company->getRecontactAfter(), $now);
         $detail['interactions'] = array_map(
-            fn (Interaction $interaction): array => ['daysAgo' => self::daysBetween($interaction->getOccurredAt(), $now)] + $this->presenter->interaction($interaction),
+            fn (Interaction $interaction): array => [
+                'daysAgo' => self::daysBetween($interaction->getOccurredAt(), $now),
+                'datesInNotes' => self::datesIn($interaction->getNotes(), $now),
+            ] + $this->presenter->interaction($interaction),
             $interactions,
         );
+        $detail['datesInCompanyNotes'] = self::datesIn($company->getNotes(), $now);
+        $detail['alerts'] = null === $latest ? [] : self::staleAppointments($latest, $now);
 
         return $detail;
+    }
+
+    /**
+     * Rendez-vous noté dans la dernière interaction mais déjà passé, sans suite saisie depuis.
+     *
+     * @return list<string>
+     */
+    private static function staleAppointments(Interaction $latest, \DateTimeImmutable $now): array
+    {
+        $alerts = [];
+        foreach (NoteDateExtractor::extract($latest->getNotes() ?? '') as $found) {
+            $days = self::daysBetween($found['date'], $now);
+            if ($found['date'] > $latest->getOccurredAt() && $days > 0) {
+                $alerts[] = sprintf(
+                    "ATTENTION : la date du %s notée dans la dernière interaction est PASSÉE depuis %d jour(s) et rien n'a été saisi depuis. Ne la présente pas comme à venir : dis qu'elle est passée et demande à l'utilisateur ce qui s'est passé.",
+                    $found['date']->format('d/m/Y'),
+                    $days,
+                );
+            }
+        }
+
+        return $alerts;
+    }
+
+    /**
+     * Dates écrites dans un texte libre, avec leur position par rapport à aujourd'hui.
+     *
+     * @return list<array{date: string, when: string}>
+     */
+    private static function datesIn(?string $text, \DateTimeImmutable $now): array
+    {
+        return array_map(static function (array $found) use ($now): array {
+            $days = self::daysBetween($found['date'], $now);
+
+            return ['date' => $found['date']->format('Y-m-d'), 'when' => match (true) {
+                0 === $days => "aujourd'hui",
+                $days > 0 => sprintf('passée, il y a %d jour(s)', $days),
+                default => sprintf('à venir, dans %d jour(s)', -$days),
+            }];
+        }, NoteDateExtractor::extract($text ?? ''));
     }
 
     private static function daysBetween(\DateTimeInterface $date, \DateTimeImmutable $now): int
