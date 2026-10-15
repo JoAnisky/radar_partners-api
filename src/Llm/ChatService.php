@@ -22,14 +22,14 @@ final readonly class ChatService
     }
 
     /** @param list<LlmMessage> $history messages `user` et `assistant` de la conversation */
-    public function answer(array $history, \DateTimeImmutable $now): ChatResult
+    public function answer(array $history, \DateTimeImmutable $now, ?ChatContext $context = null): ChatResult
     {
         $tools = [];
         foreach ($this->tools as $tool) {
             $tools[$tool->getName()] = $tool;
         }
 
-        $messages = [new LlmMessage(LlmMessage::SYSTEM, $this->systemPrompt($now)), ...$history];
+        $messages = [new LlmMessage(LlmMessage::SYSTEM, $this->systemPrompt($now, $context ?? new ChatContext())), ...$history];
         $calls = [];
 
         for ($round = 0; $round < self::MAX_ROUNDS; ++$round) {
@@ -61,13 +61,14 @@ final readonly class ChatService
         }
     }
 
-    private function systemPrompt(\DateTimeImmutable $now): string
+    private function systemPrompt(\DateTimeImmutable $now, ChatContext $context): string
     {
         $prompt = (string) file_get_contents($this->promptDir.'/system.md');
         $profile = is_file($this->promptDir.'/profile.md') ? trim((string) file_get_contents($this->promptDir.'/profile.md')) : '';
 
         return strtr($prompt, [
             '{date}' => $now->format('Y-m-d'),
+            '{context}' => $context->describe(),
             '{profile}' => '' === $profile ? '(profil non renseigné)' : $profile,
         ]);
     }

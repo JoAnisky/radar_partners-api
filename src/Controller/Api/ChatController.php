@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Llm\ChatContext;
 use App\Llm\ChatService;
 use App\Llm\LlmMessage;
 use App\Llm\LlmUnavailableException;
@@ -21,13 +22,15 @@ final class ChatController extends AbstractController
     {
     }
 
-    /** Corps : `{"messages": [{"role": "user"|"assistant", "content": "..."}]}`, le dernier message étant de l'utilisateur. */
+    /** Corps : `{"messages": [{"role": "user"|"assistant", "content": "..."}], "context": {...}}`, le dernier message étant de l'utilisateur. */
     public function __invoke(Request $request): JsonResponse
     {
-        $history = $this->history($request->toArray()['messages'] ?? null);
+        $payload = $request->toArray();
+        $history = $this->history($payload['messages'] ?? null);
+        $context = $this->context($payload['context'] ?? null);
 
         try {
-            $result = $this->chat->answer($history, new \DateTimeImmutable());
+            $result = $this->chat->answer($history, new \DateTimeImmutable(), $context);
         } catch (LlmUnavailableException $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_SERVICE_UNAVAILABLE);
         }
@@ -36,6 +39,33 @@ final class ChatController extends AbstractController
             'reply' => $result->reply,
             'toolCalls' => array_map(static fn ($call): array => ['name' => $call->name, 'arguments' => $call->arguments], $result->toolCalls),
         ]);
+    }
+
+    /** Contexte facultatif : `{"page": "Signaux", "company": {"id": 33, "name": "Acme"}}`. */
+    private function context(mixed $context): ?ChatContext
+    {
+        if (null === $context) {
+            return null;
+        }
+        $invalid = new UnprocessableEntityHttpException('context invalide : page (texte) et company ({id, name}) sont facultatifs.');
+        if (!\is_array($context)) {
+            throw $invalid;
+        }
+
+        $page = $context['page'] ?? null;
+        if (null !== $page && (!\is_string($page) || mb_strlen($page) > 100)) {
+            throw $invalid;
+        }
+
+        $company = $context['company'] ?? null;
+        if (null === $company) {
+            return new ChatContext(page: $page);
+        }
+        if (!\is_array($company) || !\is_int($company['id'] ?? null) || !\is_string($company['name'] ?? null) || mb_strlen($company['name']) > 200) {
+            throw $invalid;
+        }
+
+        return new ChatContext($company['id'], $company['name'], $page);
     }
 
     /** @return list<LlmMessage> */

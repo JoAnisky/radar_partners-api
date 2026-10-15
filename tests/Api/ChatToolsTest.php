@@ -125,6 +125,10 @@ final class ChatToolsTest extends ApiTestCase
 
     public function testChatEndpointValidatesMessages(): void
     {
+        $valid = [['role' => 'user', 'content' => 'Salut']];
+        foreach ([['messages' => $valid, 'context' => 'oups'], ['messages' => $valid, 'context' => ['company' => ['id' => 'x', 'name' => 'A']]], ['messages' => $valid, 'context' => ['page' => ['Signaux']]]] as $payload) {
+            self::assertSame(422, $this->request('POST', '/api/chat', $payload)[0], (string) json_encode($payload));
+        }
         foreach ([[], ['messages' => []], ['messages' => [['role' => 'system', 'content' => 'x']]], ['messages' => [['role' => 'user', 'content' => ' ']]], ['messages' => [['role' => 'assistant', 'content' => 'x']]]] as $payload) {
             self::assertSame(422, $this->request('POST', '/api/chat', $payload)[0], (string) json_encode($payload));
         }

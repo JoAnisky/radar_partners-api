@@ -2,6 +2,7 @@
 
 namespace App\Tests\Llm;
 
+use App\Llm\ChatContext;
 use App\Llm\ChatService;
 use App\Llm\LlmClientInterface;
 use App\Llm\LlmMessage;
@@ -66,6 +67,20 @@ final class ChatServiceTest extends TestCase
         self::assertSame(LlmMessage::SYSTEM, $system->role);
         self::assertStringContainsString('2026-10-15', $system->content);
         self::assertStringNotContainsString('{date}', $system->content);
+    }
+
+    public function testPromptTellsWhichCompanyIsOpen(): void
+    {
+        $client = self::client([new LlmMessage(LlmMessage::ASSISTANT, 'ok'), new LlmMessage(LlmMessage::ASSISTANT, 'ok')]);
+        $service = self::service($client);
+
+        $service->answer([new LlmMessage(LlmMessage::USER, 'Où j\'en suis ?')], new \DateTimeImmutable(), new ChatContext(33, 'Atol CD', 'Fiche entreprise'));
+        $service->answer([new LlmMessage(LlmMessage::USER, 'Salut')], new \DateTimeImmutable());
+
+        self::assertStringContainsString('« Atol CD » (id 33)', $client->sent[0][0]->content);
+        self::assertStringContainsString('Page ouverte : Fiche entreprise.', $client->sent[0][0]->content);
+        self::assertStringContainsString('(aucun)', $client->sent[1][0]->content);
+        self::assertStringNotContainsString('{context}', $client->sent[1][0]->content);
     }
 
     public function testRunsToolsThenAnswers(): void
