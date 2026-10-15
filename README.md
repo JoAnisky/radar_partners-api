@@ -22,7 +22,8 @@ Outil de prospection pour un **développeur freelance fullstack/DevOps** (Symfon
 | API | PHP 8.4, Symfony 8.1, Doctrine ORM, Messenger (transport Doctrine), Scheduler, HttpClient |
 | Base | PostgreSQL 17 (`jsonb`, `pg_trgm` prévu pour le rapprochement de noms, recherche plein texte FR) |
 | Front | Nuxt 4, TypeScript, Vue 3 (Composition API) |
-| LLM | derrière une interface `LlmClientInterface` (fournisseur interchangeable) |
+| LLM | derrière une interface `LlmClientInterface` (fournisseur interchangeable) ; en dev, modèle local Ollama (GPU) pour l'assistant de chat « Amelio » : voir `docs/assistant.md` |
+| Tâches planifiées | Symfony Scheduler dans un conteneur worker : ingestion quotidienne des alertes mail à 9h, rattrapée au démarrage de la machine |
 | Qualité | PHPUnit, PHPStan (niveau max visé), PHP-CS-Fixer, ESLint |
 | Infra | Docker Compose en dev (derrière Traefik), K3s + Traefik en prod |
 

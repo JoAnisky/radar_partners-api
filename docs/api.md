@@ -70,7 +70,7 @@ Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `dis
 
 ### `POST /api/chat`
 
-`{"messages": [{"role": "user"|"assistant", "content": "..."}]}` (1 à 30 messages, le dernier de l'utilisateur) → `{reply, toolCalls: [{name, arguments}]}`. `422` si le corps est invalide, `503` si le modèle local ne répond pas. Détail : `docs/assistant.md`.
+`{"messages": [{"role": "user"|"assistant", "content": "..."}], "context": {"page": "Fiche entreprise", "company": {"id": 32, "name": "Atol CD"}}}` (1 à 30 messages, le dernier de l'utilisateur ; `context` facultatif : la page ouverte et l'entreprise consultée, injectées dans l'invite pour que « cette entreprise » soit comprise) → `{reply, toolCalls: [{name, arguments}]}`. `422` si le corps ou le contexte est invalide, `503` si le modèle local ne répond pas. Détail : `docs/assistant.md`.
 
 ### `GET /api/stats`
 

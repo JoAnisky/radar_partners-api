@@ -12,7 +12,11 @@
 
 ## Interface
 
-L'assistant s'appelle **Amelio** (nom défini dans `ASSISTANT_NAME`, `front/app/utils/labels.ts`, et dans `config/assistant/system.md` ; avatar robot en SVG : `AmelioAvatar.vue`, trois visages selon l’état : normal avec clignements, en réflexion, en erreur). Bulle fixée en bas à droite (`ChatBubble`, montée dans `layouts/default.vue`), raccourci ⌘J. L'état du chat vit dans `useChat` (partagé entre pages, sauvegardé dans le navigateur). La fiche entreprise renseigne l'entreprise courante : le panneau propose alors des demandes toutes faites qui citent son nom et son id.
+L'assistant s'appelle **Amelio** (nom défini dans `ASSISTANT_NAME`, `front/app/utils/labels.ts`, et dans `config/assistant/system.md` ; avatar robot en SVG : `AmelioAvatar.vue`, trois visages selon l’état : normal avec clignements, en réflexion, en erreur). Bulle fixée en bas à droite (`ChatBubble`, montée dans `layouts/default.vue`), raccourci ⌘J. L'état du chat vit dans `useChat` (partagé entre pages, sauvegardé dans le navigateur). La fiche entreprise renseigne l'entreprise courante : le panneau propose alors des demandes toutes faites qui citent son nom et son id. **Contexte** : chaque requête envoie `context` (titre de la page + entreprise ouverte) ; `ChatContext` l'injecte dans l'invite (`{context}`) et demande d'appeler `get_company` avec cet id quand l'utilisateur dit « cette entreprise ». **Historique** : gardé dans `localStorage` (clé `radar-chat`, 60 messages, les 20 derniers envoyés). **Rendu** : les réponses sont du Markdown rendu par `markdown-it` (`html: false`, liens `noopener`, `ChatMarkdown.vue`) ; « Copier » renvoie du texte sans mise en forme (`markdownToPlain`).
+
+## Consignes de l'invite
+
+`system.md` fixe la longueur (réponses de 5 à 8 lignes, mail 5 à 8 lignes, LinkedIn 3 à 4), le texte brut pour ce qui sera envoyé, le vouvoiement par défaut, l'interdiction d'inventer des coordonnées, et les alertes qui s'adressent à l'utilisateur, jamais au destinataire. Constat du 2026-10-15 : le modèle local les suit **à peu près** (résumés passés d'environ 25 à 12-15 lignes) mais ajoute encore des rubriques ; ne pas compter sur une obéissance stricte. `profile.md` (privé) contient le profil, les cibles, les coordonnées de signature et le ton.
 
 ## Dates
 
@@ -24,4 +28,4 @@ Les petits modèles comparent mal les dates : `get_company` fournit les écarts 
 
 ## Pas encore fait
 
-Réponse en flux (l'API attend la réponse complète), historique persistant (en mémoire dans le navigateur), outils d'écriture (noter une interaction, changer un statut : prévoir une confirmation), bouton « Rédiger une approche » sur la fiche entreprise, mode démo (appels simulés), second fournisseur (Claude) derrière `LlmClientInterface`.
+Réponse en flux (l'API attend la réponse complète), outils d'écriture (noter une interaction, changer un statut : prévoir une confirmation), bouton « Rédiger une approche » sur la fiche entreprise, mode démo (faux `DemoLlmClient` aux réponses préparées, lecture seule, données Faker : prévu pour la démo en ligne ; l'outil réel reste local), second fournisseur (Claude) derrière `LlmClientInterface`.
