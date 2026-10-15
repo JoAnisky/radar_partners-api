@@ -29,7 +29,7 @@
 | Source | Statut |
 |---|---|
 | **Free-Work** (alerte mail quotidienne le matin) | MVP, alerte créée, aucun échantillon reçu. Beaucoup de bruit (Angular, Java, React) ; pas de champ d'exclusion trouvé, les compétences du profil pilotent peut-être l'alerte (non vérifié). |
-| **LinkedIn** (alertes natives par mail) | MVP, via règle de transfert depuis la boîte principale. Deux alertes freelance créées : dernières 24 h (flux) et sans limite de durée (amorçage, à supprimer ensuite). Échantillons à fournir. |
+| **LinkedIn** (alertes natives par mail) | MVP, via règle de transfert depuis la boîte principale. Deux alertes freelance créées : dernières 24 h (flux) et sans limite de durée (amorçage, à supprimer ensuite). Parseur fait (2026-10-15). |
 | **Welcome to the Jungle, HelloWork** | Piste après Free-Work. Emploi salarié : signal « entreprise qui recrute un dev ». Alertes mail non vérifiées. |
 | **API France Travail** | Non vérifié, ne pas en dépendre. Jeu open data trimestriel : trop lent pour un signal. |
 | **Apify** | Piste après l'IMAP : détection de stack (`Enricher`) sur les sites connus ; offres WTTJ éventuelles après vérification des CGU. Actors communautaires, responsabilité de l'usage à l'utilisateur. Plan gratuit 5 $/mois. |
@@ -48,7 +48,7 @@ Un signal n'est retenu que si son **titre** contient un mot entier de la liste `
   - **Aucun nom d'entreprise** dans le mail.
   - Le dernier segment du lien tracké `mjt.lu` est l'URL de l'offre en base64 (décodable sans réseau) : `https://www.free-work.com/fr/tech-it/job-mission/<catégorie>/<slug>?utm…`. Le slug identifie l'offre (fingerprint) ; la catégorie (`developpeur-java-kotlin-groovy-scala`…) donne un indice de stack.
   - Les 13 offres reçues étaient toutes hors stack (.NET, Java, Angular, Python, Go) : le filtre par stack est indispensable.
-- **LinkedIn** (`jobalerts-noreply@linkedin.com`) : seul le mail « votre alerte a été créée » est reçu pour l'instant ; il liste des offres avec **le nom de l'entreprise** (« Entreprise · Lieu »), titre et lien. Les alertes réelles auront probablement la même mise en page (à confirmer). Ce mail de confirmation n'est pas une alerte d'offres : à ignorer (objet « a été créée »).
+- **LinkedIn** (`jobalerts-noreply@linkedin.com`, échantillon réel du 2026-10-15, parseur `src/Signal/LinkedIn/`) : un lien `/jobs/view/{id}` (l'id sert de fingerprint) portant le titre, puis un `<p>` « Entreprise · Lieu (Hybride|À distance) ». Le mail annonce 11 offres mais n'en contient que 6. Entreprise toujours présente (`companyName`, à rapprocher via `ResolveCompany`, pas encore fait). Le mail « alerte créée » est ignoré par le parseur. Ancien constat : le mail « votre alerte a été créée » était le seul reçu ; il liste des offres avec **le nom de l'entreprise** (« Entreprise · Lieu »), titre et lien. Les alertes réelles auront probablement la même mise en page (à confirmer). Ce mail de confirmation n'est pas une alerte d'offres : à ignorer (objet « a été créée »).
 - **Transfert manuel** : l'expéditeur visible est celui qui transfère ; l'expéditeur d'origine est lu dans le bandeau « Forwarded message » (`RawEmail::isFrom()`). Le comportement des règles de transfert automatiques reste à confirmer.
 
 ### Conséquence : l'entreprise n'est pas toujours connue
@@ -75,4 +75,4 @@ CGU lues le 2026-10-13 (version du 14/09/2026, lecture automatisée à confirmer
 
 1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Marquage des mails traités non implémenté : la déduplication par `fingerprint` suffit (`app:signals:ingest` relit les mails depuis `--since`).
 2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work fait (`src/Signal/FreeWork/`) ; aperçu avec `app:signals:preview` (rien n'est enregistré).
-3. Fait : `app:signals:ingest` (filtre de stack, déduplication, enregistrement). Reste : parseurs LinkedIn et Indeed dès les premiers vrais mails d'offres. Offres sans entreprise : résolution manuelle (décidé).
+3. Fait : `app:signals:ingest` (filtre de stack, déduplication, enregistrement). Parseur LinkedIn fait (2026-10-15). Reste : parseur Indeed dès le premier vrai mail. Offres sans entreprise : résolution manuelle (décidé).
