@@ -50,6 +50,9 @@ class Signal
     #[ORM\Column]
     private \DateTimeImmutable $detectedAt;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $dismissedAt = null;
+
     public function __construct(SignalType $type, string $source, string $fingerprint)
     {
         $this->type = $type;
@@ -160,6 +163,18 @@ class Signal
     public function setDetectedAt(\DateTimeImmutable $detectedAt): static
     {
         $this->detectedAt = $detectedAt;
+
+        return $this;
+    }
+
+    public function getDismissedAt(): ?\DateTimeImmutable
+    {
+        return $this->dismissedAt;
+    }
+
+    public function setDismissedAt(?\DateTimeImmutable $dismissedAt): static
+    {
+        $this->dismissedAt = $dismissedAt;
 
         return $this;
     }

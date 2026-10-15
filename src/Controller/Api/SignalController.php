@@ -46,13 +46,19 @@ final class SignalController extends AbstractController
         ]);
     }
 
-    /** Rattache le signal à une entreprise (`{"companyId": 12}`) ou le détache (`{"companyId": null}`). */
+    /** Rattache le signal (`{"companyId": 12}`), le détache (`{"companyId": null}`), l'écarte ou le restaure (`{"dismissed": true|false}`). */
     #[Route('/{id}', requirements: ['id' => '\d+'], methods: ['PATCH'])]
-    public function attach(Signal $signal, Request $request): JsonResponse
+    public function update(Signal $signal, Request $request): JsonResponse
     {
         $payload = $request->toArray();
-        if (!\array_key_exists('companyId', $payload) || 1 !== \count($payload)) {
-            throw new UnprocessableEntityHttpException('Le corps doit contenir uniquement companyId.');
+        if (1 !== \count($payload)) {
+            throw new UnprocessableEntityHttpException('Le corps doit contenir uniquement companyId ou dismissed.');
+        }
+        if (\array_key_exists('dismissed', $payload)) {
+            return $this->dismiss($signal, $payload['dismissed']);
+        }
+        if (!\array_key_exists('companyId', $payload)) {
+            throw new UnprocessableEntityHttpException('Le corps doit contenir uniquement companyId ou dismissed.');
         }
 
         $company = null;
@@ -64,6 +70,7 @@ final class SignalController extends AbstractController
         }
 
         $previous = $signal->getCompany();
+        $signal->setDismissedAt(null);
         $changed = $company !== $previous;
         $signal->setCompany($company);
 
@@ -77,6 +84,21 @@ final class SignalController extends AbstractController
         foreach (array_filter([$company, $previous !== $company ? $previous : null]) as $affected) {
             $this->scorer->rescore($affected);
         }
+        $this->em->flush();
+
+        return $this->json($this->presenter->signal($signal));
+    }
+
+    private function dismiss(Signal $signal, mixed $dismissed): JsonResponse
+    {
+        if (!\is_bool($dismissed)) {
+            throw new UnprocessableEntityHttpException('dismissed doit être un booléen.');
+        }
+        if ($dismissed && null !== $signal->getCompany()) {
+            throw new UnprocessableEntityHttpException('Un signal rattaché à une entreprise ne peut pas être écarté.');
+        }
+
+        $signal->setDismissedAt($dismissed ? new \DateTimeImmutable() : null);
         $this->em->flush();
 
         return $this->json($this->presenter->signal($signal));

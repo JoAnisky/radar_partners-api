@@ -61,11 +61,11 @@ Règle de statut (`PipelineStatusResolver::followEdit`) : si la date ou le résu
 
 ### `GET /api/signals`
 
-Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `page`, `perPage`. Chaque item porte `companyId` et `companyName`.
+Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `dismissed=1` pour les seuls signaux écartés (ils sont exclus sinon, y compris de l'accueil) ; `page`, `perPage`. Chaque item porte `companyId`, `companyName` et `dismissedAt`.
 
 ### `PATCH /api/signals/{id}`
 
-`{"companyId": 12}` rattache, `{"companyId": null}` détache ; rien d'autre n'est accepté. Règle : rattacher une offre (`JOB_POSTING` ou `FREELANCE_MISSION`) à une entreprise `ON_HOLD` met sa date de relance à maintenant : elle remonte dans « à relancer ».
+`{"companyId": 12}` rattache (et restaure un signal écarté), `{"companyId": null}` détache ; `{"dismissed": true}` écarte (`422` si le signal a une entreprise), `{"dismissed": false}` restaure. Un seul champ à la fois, rien d'autre n'est accepté. Règle : rattacher une offre (`JOB_POSTING` ou `FREELANCE_MISSION`) à une entreprise `ON_HOLD` met sa date de relance à maintenant : elle remonte dans « à relancer ».
 
 ### `GET /api/stats`
 

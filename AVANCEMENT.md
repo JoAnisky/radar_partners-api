@@ -39,7 +39,7 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 ## Dashboard (étape 6) : première tranche
 
 - [x] **API de lecture** : `GET /api/companies` (filtres, tri, pagination, recherche sans accent) et `GET /api/companies/{id}` (contacts, interactions, signaux), CORS, 91 tests dont des tests sur base `radar_test`. Voir `docs/api.md`.
-- [x] **API d'écriture** : création d'entreprise, modification partielle (statut, notes, flags, archivage), saisie d'interaction (statut mis à jour sans écraser un statut manuel), liste des signaux et rattachement à une entreprise. 122 tests. Voir `docs/api.md`.
+- [x] **API d'écriture** : création d'entreprise, modification partielle (statut, notes, flags, archivage), saisie d'interaction (statut mis à jour sans écraser un statut manuel), liste des signaux, rattachement à une entreprise, écartement/restauration (`dismissedAt`). 122 tests. Voir `docs/api.md`.
 - [x] **Gestion des contacts** : création, modification et suppression (RGPD, interactions conservées) depuis la fiche ; onglet Contacts (liste globale avec recherche, tri, dernier échange). 157 tests.
 - [x] **Modification des informations d'une entreprise** : nom, site, adresse, ville, code postal, téléphone, email, SIREN, NAF, effectif, type, zone (validations, 409 sur nom/SIREN en doublon) ; formulaire dans la fiche. 142 tests.
 - [x] **Modification d'une interaction** : `PATCH /api/interactions/{id}`, le statut suit la déduction seulement s'il la suivait déjà ; bouton « Modifier » dans l'historique. 137 tests.

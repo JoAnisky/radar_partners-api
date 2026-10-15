@@ -92,6 +92,52 @@ final class SignalApiTest extends ApiTestCase
         self::assertSame([], self::names($this->get('/api/companies?due=1')[1]));
     }
 
+    public function testDismissedSignalsLeaveTheListAndShowInArchive(): void
+    {
+        $this->signal('Kept');
+        $dismissed = $this->signal('Dismissed');
+
+        [$status, $body] = $this->request('PATCH', '/api/signals/'.$dismissed->getId(), ['dismissed' => true]);
+        self::assertSame(200, $status);
+        self::assertNotNull(self::at($body, 'dismissedAt'));
+
+        self::assertSame(['Kept'], self::titles($this->get('/api/signals?unresolved=1')[1]));
+        self::assertSame(['Dismissed'], self::titles($this->get('/api/signals?dismissed=1')[1]));
+
+        $this->request('PATCH', '/api/signals/'.$dismissed->getId(), ['dismissed' => false]);
+        self::assertSame(2, self::at($this->get('/api/signals')[1], 'total'));
+        self::assertSame([], self::titles($this->get('/api/signals?dismissed=1')[1]));
+    }
+
+    public function testAttachedSignalCannotBeDismissed(): void
+    {
+        $company = $this->company('Acme');
+        $signal = $this->signal('Offer');
+        $this->request('PATCH', '/api/signals/'.$signal->getId(), ['companyId' => $company->getId()]);
+
+        self::assertSame(422, $this->request('PATCH', '/api/signals/'.$signal->getId(), ['dismissed' => true])[0]);
+    }
+
+    public function testAttachingRestoresADismissedSignal(): void
+    {
+        $company = $this->company('Acme');
+        $signal = $this->signal('Offer');
+        $this->request('PATCH', '/api/signals/'.$signal->getId(), ['dismissed' => true]);
+
+        $this->request('PATCH', '/api/signals/'.$signal->getId(), ['companyId' => $company->getId()]);
+
+        self::assertSame(['Offer'], self::titles($this->get('/api/signals')[1]));
+    }
+
+    public function testDismissRejectsInvalidValues(): void
+    {
+        $uri = '/api/signals/'.$this->signal('Offer')->getId();
+
+        foreach ([['dismissed' => 'yes'], ['dismissed' => null], ['dismissed' => true, 'companyId' => null]] as $payload) {
+            self::assertSame(422, $this->request('PATCH', $uri, $payload)[0], (string) json_encode($payload));
+        }
+    }
+
     public function testAttachRejectsInvalidPayloads(): void
     {
         $uri = '/api/signals/'.$this->signal('Offer')->getId();

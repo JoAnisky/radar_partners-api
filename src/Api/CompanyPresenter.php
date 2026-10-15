@@ -112,6 +112,7 @@ final class CompanyPresenter
             'url' => $signal->getUrl(),
             'detectedAt' => self::date($signal->getDetectedAt()),
             'publishedAt' => self::date($signal->getPublishedAt()),
+            'dismissedAt' => self::date($signal->getDismissedAt()),
             'extracted' => $signal->getExtracted(),
         ];
     }

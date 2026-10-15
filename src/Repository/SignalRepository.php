@@ -34,7 +34,8 @@ class SignalRepository extends ServiceEntityRepository
     /** @return array{items: list<Signal>, total: int} */
     public function search(SignalListQuery $query): array
     {
-        $qb = $this->createQueryBuilder('s');
+        $qb = $this->createQueryBuilder('s')
+            ->andWhere($query->dismissed ? 's.dismissedAt IS NOT NULL' : 's.dismissedAt IS NULL');
         if ($query->unresolved) {
             $qb->andWhere('s.company IS NULL');
         }
