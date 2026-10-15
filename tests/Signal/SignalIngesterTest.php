@@ -42,7 +42,7 @@ final class SignalIngesterTest extends TestCase
             },
         );
 
-        return new SignalIngester($em, $repository, new StackFilter(['symfony', 'php']));
+        return new SignalIngester($em, $repository, new StackFilter(['symfony', 'php'], ['java']));
     }
 
     public function testFilteredSignalIsNotStored(): void
@@ -72,6 +72,25 @@ final class SignalIngesterTest extends TestCase
         self::assertSame(['city' => 'Paris'], $persisted->getExtracted());
         self::assertNull($persisted->getCompany());
         self::assertEquals(new \DateTimeImmutable('2026-10-13 08:40'), $persisted->getDetectedAt());
+    }
+
+    public function testTitleWithoutTechnologyIsStoredToReview(): void
+    {
+        $persisted = null;
+
+        $outcome = $this->ingester(null, $persisted, 1)->ingest($this->raw('Développeur Freelance'));
+
+        self::assertSame(IngestOutcome::Created, $outcome);
+        self::assertTrue($persisted?->getExtracted()['toReview']);
+    }
+
+    public function testStackMatchIsNotMarkedToReview(): void
+    {
+        $persisted = null;
+
+        $this->ingester(null, $persisted, 1)->ingest($this->raw());
+
+        self::assertArrayNotHasKey('toReview', $persisted?->getExtracted() ?? []);
     }
 
     public function testCompanyNameIsKeptInExtractedData(): void

@@ -39,6 +39,8 @@
 
 Un signal n'est retenu que si son **titre** contient un mot entier de la liste `app.stack_keywords` (`config/services.yaml`) : symfony, php, laravel, wordpress, vue, nuxt, docker, kubernetes, k3s, devops. Implémenté dans `StackFilter`. « fullstack » seul ne qualifie pas (les offres fullstack reçues étaient Java/.NET/Angular) ; React n'est pas dans la liste. La catégorie de l'URL Free-Work est ignorée : elle regroupe plusieurs technos (`…react-angular-vue`). Sur l'échantillon du 2026-10-13 : 1 offre retenue sur 10.
 
+**Mise à jour (2026-10-15) : catégorie « à vérifier »**. Un titre qui ne nomme **aucune** techno (« Développeur Freelance », « Dev FullStack ») n'est plus écarté : le signal est enregistré avec `extracted.toReview = true` et un badge « À vérifier » dans la page Signaux. Sont écartés seulement les titres qui nomment une autre techno connue (liste `app.other_stack_keywords`, `config/services.yaml`) sans mot-clé de la stack. Une techno absente des deux listes tombe en « à vérifier » : compléter la liste d'exclusion si le bruit gêne.
+
 ## Structure des alertes (échantillons du 2026-10-13)
 
 Échantillons dans `var/import/samples/` (ignoré par git ; obtenus avec `app:mailbox:export`).

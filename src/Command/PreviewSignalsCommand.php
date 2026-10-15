@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Signal\SignalSourceInterface;
 use App\Signal\StackFilter;
+use App\Signal\StackMatch;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -26,17 +27,22 @@ final readonly class PreviewSignalsCommand
         #[Option(description: 'Afficher aussi les signaux écartés')] bool $all = false,
     ): int {
         $rows = [];
-        $kept = $total = 0;
+        $kept = $review = $total = 0;
 
         foreach ($this->sources as $source) {
             foreach ($source->fetch(new \DateTimeImmutable($since)) as $signal) {
                 ++$total;
-                $matches = $this->stackFilter->matches($signal);
-                $kept += (int) $matches;
+                $stack = $this->stackFilter->classify($signal);
+                $kept += (int) (StackMatch::Match === $stack);
+                $review += (int) (StackMatch::Review === $stack);
 
-                if ($matches || $all) {
+                if (StackMatch::Excluded !== $stack || $all) {
                     $rows[] = [
-                        $matches ? 'oui' : 'non',
+                        match ($stack) {
+                            StackMatch::Match => 'oui',
+                            StackMatch::Review => 'à vérifier',
+                            StackMatch::Excluded => 'non',
+                        },
                         $signal->source,
                         mb_strimwidth($signal->title, 0, 60, '…'),
                         $signal->extracted['city'] ?? '',
@@ -47,7 +53,7 @@ final readonly class PreviewSignalsCommand
         }
 
         $io->table(['Retenu', 'Source', 'Titre', 'Ville', 'TJM'], $rows);
-        $io->success(sprintf('%d signal(aux) lu(s), %d retenu(s) par le filtre de stack.', $total, $kept));
+        $io->success(sprintf('%d signal(aux) lu(s), %d retenu(s), %d à vérifier.', $total, $kept, $review));
 
         return 0;
     }

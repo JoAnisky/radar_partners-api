@@ -17,7 +17,8 @@ final readonly class SignalIngester
 
     public function ingest(RawSignal $raw): IngestOutcome
     {
-        if (!$this->stackFilter->matches($raw)) {
+        $stack = $this->stackFilter->classify($raw);
+        if (StackMatch::Excluded === $stack) {
             return IngestOutcome::Filtered;
         }
 
@@ -28,6 +29,9 @@ final readonly class SignalIngester
         $extracted = $raw->extracted;
         if (null !== $raw->companyName) {
             $extracted += ['companyName' => $raw->companyName];
+        }
+        if (StackMatch::Review === $stack) {
+            $extracted['toReview'] = true;
         }
         if (!\array_key_exists('remote', $extracted) && RemoteDetector::isRemote($raw->title.' '.$raw->rawContent)) {
             $extracted['remote'] = true;

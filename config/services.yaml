@@ -9,6 +9,7 @@
 parameters:
     app.recontact_delay: 'P6M'
     app.stack_keywords: [symfony, php, laravel, wordpress, vue, nuxt, docker, kubernetes, k3s, devops]
+    app.other_stack_keywords: [java, net, dotnet, python, angular, react, node, nodejs, js, javascript, typescript, golang, go, ruby, rails, django, scala, kotlin, swift, ios, android, flutter, sap, salesforce, odoo, abap, cobol, rust, c, data, mobile]
 
 services:
     # default configuration for services in *this* file
