@@ -16,6 +16,7 @@ doctrine:
         dql:
             string_functions:
                 UNACCENT: App\Doctrine\UnaccentFunction
+                INITIALS: App\Doctrine\InitialsFunction
         mappings:
             App:
                 type: attribute

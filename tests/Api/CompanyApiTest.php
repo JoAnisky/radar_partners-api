@@ -49,6 +49,19 @@ final class CompanyApiTest extends ApiTestCase
         self::assertSame(['Acme'], self::names($this->get('/api/companies?q=besançon')[1]));
     }
 
+    public function testSearchByAcronym(): void
+    {
+        $this->company('Business Web Agence');
+        $this->company('Bureau Wallon Associés');
+        $this->company('Atol CD');
+        $this->company('Élan Web');
+        $this->em->flush();
+
+        self::assertSame(['Bureau Wallon Associés', 'Business Web Agence'], self::names($this->get('/api/companies?q=bwa&sort=name')[1]));
+        self::assertSame(['Élan Web'], self::names($this->get('/api/companies?q=EW')[1]));
+        self::assertSame([], self::names($this->get('/api/companies?q=xyz')[1]));
+    }
+
     public function testDueFilter(): void
     {
         $this->company('Recontact due')->setRecontactAfter(new \DateTimeImmutable('-1 day'));

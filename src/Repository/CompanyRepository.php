@@ -68,8 +68,15 @@ class CompanyRepository extends ServiceEntityRepository
             ->andWhere($query->archived ? 'c.archivedAt IS NOT NULL' : 'c.archivedAt IS NULL');
 
         if (null !== $query->q && '' !== trim($query->q)) {
-            $qb->andWhere('UNACCENT(LOWER(c.name)) LIKE UNACCENT(:q) OR UNACCENT(LOWER(c.city)) LIKE UNACCENT(:q) OR c.siren LIKE :q')
-                ->setParameter('q', '%'.addcslashes(mb_strtolower(trim($query->q)), '%_\\').'%');
+            $text = mb_strtolower(trim($query->q));
+            $conditions = ['UNACCENT(LOWER(c.name)) LIKE UNACCENT(:q)', 'UNACCENT(LOWER(c.city)) LIKE UNACCENT(:q)', 'c.siren LIKE :q'];
+            $qb->setParameter('q', '%'.addcslashes($text, '%_\\').'%');
+            if (1 === preg_match('/^[a-z]{2,6}$/', $text)) {
+                // Sigle : « bwa » retrouve « Business Web Agence ».
+                $conditions[] = 'LOWER(INITIALS(c.name)) = :initials';
+                $qb->setParameter('initials', $text);
+            }
+            $qb->andWhere(implode(' OR ', $conditions));
         }
 
         if (null !== $query->status) {
