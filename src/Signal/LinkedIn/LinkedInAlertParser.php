@@ -26,7 +26,7 @@ final class LinkedInAlertParser
         $seen = [];
 
         foreach ($document->querySelectorAll('a[href*="/jobs/view/"]') as $link) {
-            $title = null === $link->querySelector('table') ? $this->clean($link->textContent) : '';
+            $title = null === $link->querySelector('table') ? $this->clean((string) $link->textContent) : '';
             $id = $this->jobId((string) $link->getAttribute('href'));
             if ('' === $title || null === $id || isset($seen[$id])) {
                 continue;
