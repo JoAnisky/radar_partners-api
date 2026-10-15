@@ -68,6 +68,10 @@ Signaux, plus récents d'abord ; `unresolved=1` pour ceux sans entreprise ; `dis
 
 `{"companyId": 12}` rattache (et restaure un signal écarté), `{"companyId": null}` détache ; `{"dismissed": true}` écarte (`422` si le signal a une entreprise), `{"dismissed": false}` restaure. Un seul champ à la fois, rien d'autre n'est accepté. Règle : rattacher une offre (`JOB_POSTING` ou `FREELANCE_MISSION`) à une entreprise `ON_HOLD` met sa date de relance à maintenant : elle remonte dans « à relancer ».
 
+### `POST /api/chat`
+
+`{"messages": [{"role": "user"|"assistant", "content": "..."}]}` (1 à 30 messages, le dernier de l'utilisateur) → `{reply, toolCalls: [{name, arguments}]}`. `422` si le corps est invalide, `503` si le modèle local ne répond pas. Détail : `docs/assistant.md`.
+
 ### `GET /api/stats`
 
 Tout ce qu'affiche l'accueil, en un appel (`src/Stats/StatsProvider.php`) :

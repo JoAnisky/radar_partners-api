@@ -37,6 +37,7 @@ Modèle visuel : une capture de tableau de bord « Apex » en mode sombre (non v
 | `components/ContactForm.vue` | Ajout et modification d'un contact ; ajout, modification et suppression (avec confirmation) depuis la carte Contacts |
 | `components/CompanyForm.vue` | Modification des informations d'une entreprise (bouton « Modifier » de la carte Informations) ; n'envoie que les champs changés |
 | `components/InteractionForm.vue` | Saisie ou modification d'une interaction (bouton « Modifier » dans l'historique) ; les dates inchangées ne sont pas renvoyées |
+| `pages/assistant.vue` | Chat avec le modèle local : questions suggérées, outils appelés (dépliable), copie des réponses |
 | `pages/signals.vue` + `components/SignalAttach.vue` | Offres sans entreprise : recherche d'une entreprise et rattachement, ou création ; « Écarter » (onglet Archivées avec « Restaurer »), badge « À vérifier » |
 | `components/KpiCard.vue`, `SparklineChart.vue`, `AreaChart.vue`, `DonutChart.vue`, `DashboardCard.vue`, `SegmentedControl.vue` | Briques du tableau de bord (carte indicateur, mini-courbe, courbe d'activité, donut, carte, sélecteur) |
 | `components/StatusBadge.vue`, `components/ScoreBadge.vue` | Badges de statut et de score (couleur selon le niveau) ; la fiche affiche le détail du score |

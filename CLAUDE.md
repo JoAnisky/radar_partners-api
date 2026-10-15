@@ -24,6 +24,7 @@ Une version démo (données fictives) sera exposée sur jonathanlore.fr.
 | `docs/sources.md` | Sourcing : sources, pistes, boîte IMAP, règle de filtrage, prochaines étapes |
 | `docs/api.md` | Endpoints HTTP, paramètres, décisions techniques, base de test |
 | `docs/front.md` | Front Nuxt : choix, pages, vérifications, points ouverts |
+| `docs/assistant.md` | Chat avec modèle local (Ollama) : architecture, outils, changer de modèle |
 | `docs/import.md` | Import du tableur : règles et décisions d'implémentation |
 
 ## Stack
