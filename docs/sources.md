@@ -73,8 +73,16 @@ CGU lues le 2026-10-13 (version du 14/09/2026, lecture automatisée à confirmer
 - Écartés : Outlook.com (OAuth seul), Proton (Bridge payant, local), `contact@` du site perso (mélange). Alternative payante : 2ᵉ boîte Hostinger (`imap.hostinger.com:993`, non vérifié).
 - Gmail expose les étiquettes comme dossiers : lire `INBOX` + filtre expéditeur.
 
+## Ingestion planifiée (2026-10-15)
+
+- **Quand** : tous les jours à 9h (Europe/Paris), l'alerte Free-Work arrivant vers 8h40. Déclaré dans `src/Schedule.php` : `RecurringMessage::cron` + `RunCommandMessage('app:signals:ingest --since="-14 days"')` (le paquet `dragonmantank/cron-expression` est requis pour le cron).
+- **Rattrapage** : la planification est `stateful` avec `processOnlyLastMissedRun`. Si le PC était éteint à 9h, le worker rattrape à son démarrage (en une exécution, parfois deux d'affilée si l'état est très ancien : sans conséquence, l'ingestion ne crée jamais de doublon). L'état est dans le cache de l'application (`var/cache`) : un `cache:clear` l'efface, sans gravité (la déduplication par `fingerprint` rend toute relecture sans danger).
+- **Fenêtre** : 14 jours de mails relus à chaque passage. Après plus de deux semaines d'arrêt, les offres plus anciennes seraient manquées (lancer `app:signals:ingest --since=…` à la main).
+- **Exécution** : conteneur `radarpartners-worker` (même image que l'API, `messenger:consume scheduler_default`). Tous les conteneurs ont `restart: unless-stopped` ; pour qu'ils démarrent avec la session Windows, activer « Start Docker Desktop when you sign in » dans Docker Desktop.
+- **Suivre** : `docker logs radarpartners-worker` (la commande journalise une ligne « Ingestion des signaux » avec les compteurs) ; prochain passage : `php bin/console debug:schedule`.
+
 ## Prochaines étapes
 
 1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Marquage des mails traités non implémenté : la déduplication par `fingerprint` suffit (`app:signals:ingest` relit les mails depuis `--since`).
 2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work fait (`src/Signal/FreeWork/`) ; aperçu avec `app:signals:preview` (rien n'est enregistré).
-3. Fait : `app:signals:ingest` (filtre de stack, déduplication, enregistrement). Parseur LinkedIn fait (2026-10-15). Reste : parseur Indeed dès le premier vrai mail. Offres sans entreprise : résolution manuelle (décidé).
+3. Fait : `app:signals:ingest` (filtre de stack, déduplication, enregistrement). Parseur LinkedIn fait (2026-10-15). Reste : parseur Indeed dès le premier vrai mail. Ingestion planifiée : faite, voir plus haut. Offres sans entreprise : résolution manuelle (décidé).

@@ -46,7 +46,7 @@ radar_partners/
 
 Dev : tout tourne dans Docker (aucun PHP/Node local), derrière Traefik (réseau externe `web`).
 `make up` / `make bash` dans chaque repo. URLs : `radarpartners.api.dev.local` (API), `radarpartners.dev.local` (front).
-Conteneurs : `radarpartners-api`, `radarpartners-db`, `radarpartners-front` (le front joint l'API via `http://radarpartners-api` sur le réseau `web`).
+Conteneurs : `radarpartners-api`, `radarpartners-worker` (tâches planifiées), `radarpartners-db`, `radarpartners-llm` (Ollama), `radarpartners-front` (le front joint l'API via `http://radarpartners-api` sur le réseau `web`).
 Commandes PHP/Composer toujours dans le conteneur : `docker exec radarpartners-api composer ...` ou `php bin/console ...`.
 Commits : un repo par projet, chacun avec ses propres commits.
 

@@ -6,6 +6,7 @@ use App\Signal\IngestOutcome;
 use App\Signal\SignalIngester;
 use App\Signal\SignalSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -20,6 +21,7 @@ final readonly class IngestSignalsCommand
         private iterable $sources,
         private SignalIngester $ingester,
         private EntityManagerInterface $em,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -52,6 +54,8 @@ final readonly class IngestSignalsCommand
             $connection->rollBack();
             throw $e;
         }
+
+        $this->logger->info('Ingestion des signaux', $counts + ['dryRun' => $dryRun]);
 
         if ([] !== $created) {
             $io->table(['Source', 'Titre', 'Ville'], $created);

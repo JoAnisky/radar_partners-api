@@ -1,18 +1,23 @@
+x-api: &api
+    image: radarpartners-api
+    build:
+        context: .
+        dockerfile: .docker/Dockerfile
+        target: ${APP_ENV:-dev}
+    restart: unless-stopped
+    environment:
+        APP_ENV: ${APP_ENV:-dev}
+        APP_DEBUG: ${APP_DEBUG:-1}
+        DATABASE_URL: postgresql://radar:radar@radarpartners-db:5432/radar?serverVersion=17&charset=utf8
+    volumes:
+        - "./:/var/www/html"
+    depends_on:
+        - radarpartners-db
+
 services:
     radarpartners-api:
-        build:
-            context: .
-            dockerfile: .docker/Dockerfile
-            target: ${APP_ENV:-dev}
+        <<: *api
         container_name: radarpartners-api
-        environment:
-            APP_ENV: ${APP_ENV:-dev}
-            APP_DEBUG: ${APP_DEBUG:-1}
-            DATABASE_URL: postgresql://radar:radar@radarpartners-db:5432/radar?serverVersion=17&charset=utf8
-        volumes:
-            - "./:/var/www/html"
-        depends_on:
-            - radarpartners-db
         networks:
             - web
             - default
@@ -20,9 +25,18 @@ services:
             - "traefik.enable=true"
             - "traefik.http.routers.radarpartners-api.rule=Host(`${DOMAIN:-localhost}`)"
 
+    # Exécute les tâches planifiées (src/Schedule.php) : ingestion des alertes mail chaque jour à 9h, rattrapée au démarrage.
+    radarpartners-worker:
+        <<: *api
+        container_name: radarpartners-worker
+        command: php bin/console messenger:consume scheduler_default -vv
+        networks:
+            - default
+
     radarpartners-db:
         image: postgres:17-alpine
         container_name: radarpartners-db
+        restart: unless-stopped
         environment:
             POSTGRES_USER: radar
             POSTGRES_PASSWORD: radar
@@ -36,6 +50,7 @@ services:
     radarpartners-llm:
         image: ollama/ollama
         container_name: radarpartners-llm
+        restart: unless-stopped
         volumes:
             - radarpartners_llm_data:/root/.ollama
         networks:
