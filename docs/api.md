@@ -15,6 +15,7 @@ Liste paginée. Réponse : `{ items, total, page, perPage }` ; chaque item : id,
 | `scope` | `LOCAL`, `NATIONAL` | |
 | `due` | `1` : relance dépassée, ou prochaine action échue sur la dernière interaction | |
 | `archived` | `1` : seulement les archivées (sinon exclues) | |
+| `hidePartners` | `1` : exclut les `PARTNER` (sans effet si `status` est donné) | |
 | `sort` | `name`, `score`, `recontactAfter`, `lastInteractionAt`, `createdAt` (valeurs vides en dernier) | `name` |
 | `direction` | `asc`, `desc` | `asc` |
 | `page`, `perPage` | `perPage` de 1 à 100 | 1, 25 |

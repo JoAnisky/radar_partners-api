@@ -15,6 +15,8 @@ final readonly class CompanyListQuery
         /** Entreprises à relancer : date de relance dépassée ou prochaine action échue. */
         public bool $due = false,
         public bool $archived = false,
+        /** Exclut les partenaires, sauf si un statut précis est demandé. */
+        public bool $hidePartners = false,
         #[Assert\Choice(choices: ['name', 'score', 'recontactAfter', 'lastInteractionAt', 'createdAt'])]
         public string $sort = 'name',
         #[Assert\Choice(choices: ['asc', 'desc'])]

@@ -66,6 +66,17 @@ final class CompanyApiTest extends ApiTestCase
         self::assertSame(['Next action due', 'Recontact due'], self::names($this->get('/api/companies?due=1')[1]));
     }
 
+    public function testHidePartnersUnlessAStatusIsRequested(): void
+    {
+        $this->company('Prospect');
+        $this->company('Partner')->setStatus(PipelineStatus::Partner);
+        $this->em->flush();
+
+        self::assertSame(['Partner', 'Prospect'], self::names($this->get('/api/companies')[1]));
+        self::assertSame(['Prospect'], self::names($this->get('/api/companies?hidePartners=1')[1]));
+        self::assertSame(['Partner'], self::names($this->get('/api/companies?hidePartners=1&status=PARTNER')[1]));
+    }
+
     public function testSortByLastInteractionPutsEmptyOnesLast(): void
     {
         $this->interaction($this->company('Old'), '-30 days');

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Api\CompanyListQuery;
 use App\Entity\Company;
 use App\Entity\Interaction;
+use App\Enum\PipelineStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -73,6 +74,10 @@ class CompanyRepository extends ServiceEntityRepository
 
         if (null !== $query->status) {
             $qb->andWhere('c.status = :status')->setParameter('status', $query->status);
+        }
+
+        if ($query->hidePartners && null === $query->status) {
+            $qb->andWhere('c.status <> :partner')->setParameter('partner', PipelineStatus::Partner);
         }
 
         if (null !== $query->scope) {
