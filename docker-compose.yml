@@ -18,6 +18,8 @@ services:
     radarpartners-api:
         <<: *api
         container_name: radarpartners-api
+        # Au démarrage du PC, Docker peut lancer le conteneur avant que WSL monte le projet : quitter pour être relancé.
+        command: sh -c 'test -f /var/www/html/bin/console || { echo "Projet non monté, nouvel essai"; sleep 3; exit 1; }; exec apache2-foreground'
         networks:
             - web
             - default

@@ -106,4 +106,5 @@ Règles du dépôt : commits courts en anglais, un repo = ses propres commits, j
 | Pas d'ingestion à 9h | `docker logs radarpartners-worker` ; `docker ps` (worker démarré ?) ; `console debug:schedule` |
 | Page blanche ou erreur 500 côté front | `docker logs radarpartners-front`, `make logs` dans `api/` |
 | Beaucoup de tests API en erreur 500 | La base de test n'est pas migrée : `console doctrine:migrations:migrate --env=test` |
+| Erreur CORS ou 403 dans le front juste après le démarrage du PC | L'API a démarré avant que WSL monte le projet (dossier vide). `docker exec radarpartners-api ls /var/www/html` : vide ? alors `docker restart radarpartners-api`. Le conteneur quitte maintenant de lui-même dans ce cas pour être relancé |
 | Un `composer require` a modifié `docker-compose.yml` | Retirer les blocs ajoutés par la recette Flex ; supprimer `compose.override.yaml` |
