@@ -51,7 +51,7 @@ docker exec radarpartners-api vendor/bin/phpunit
 ```
 
 - URLs de dev : `radarpartners.api.dev.local` (API), `radarpartners.dev.local` (front).
-- Conteneurs : `radarpartners-api`, `radarpartners-db`, `radarpartners-front`.
+- Conteneurs : `radarpartners-api`, `radarpartners-worker` (tâches planifiées), `radarpartners-db`, `radarpartners-llm` (Ollama), `radarpartners-front`.
 - Import du tableur : `docker exec radarpartners-api php bin/console app:import:prospection <fichier.xlsx> [--dry-run]` (le fichier va dans `api/var/import/`, ignoré par git).
 
 ## Modèle de domaine
@@ -77,7 +77,7 @@ Principes : une source, un enricher ou une règle de scoring = une classe tagué
 
 ## Où on en est
 
-Voir [`AVANCEMENT.md`](AVANCEMENT.md). Fait : Docker, entités + migrations, import du tableur, connexion IMAP testée (boîte Gmail dédiée). En cours : sourcing (alertes Free-Work et LinkedIn en attente d'échantillons). À venir : lecteur IMAP et parseurs, résolution d'entreprise et scoring, dashboard Nuxt.
+Voir [`AVANCEMENT.md`](AVANCEMENT.md). Fait : Docker, entités + migrations, import du tableur, référentiel local d'entreprises (Besançon), lecteur IMAP (boîte Gmail dédiée), ingestion quotidienne des alertes Free-Work et LinkedIn avec filtre de stack, scoring explicable, API et dashboard Nuxt (thème sombre), assistant de chat local. À venir : parseur Indeed, résolution automatique d'entreprise des signaux, authentification, nouvelles sources d'offres.
 
 ## Sources de signaux : contraintes
 
