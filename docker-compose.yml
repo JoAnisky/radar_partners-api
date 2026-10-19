@@ -27,11 +27,12 @@ services:
             - "traefik.enable=true"
             - "traefik.http.routers.radarpartners-api.rule=Host(`${DOMAIN:-localhost}`)"
 
-    # Exécute les tâches planifiées (src/Schedule.php) : ingestion des alertes mail chaque jour à 9h, rattrapée au démarrage.
+    # Exécute les tâches planifiées (src/Schedule.php) : ingestion des alertes mail chaque jour à 9h.
+    # Le rattrapage Symfony saute les passages manqués : on ingère explicitement au démarrage.
     radarpartners-worker:
         <<: *api
         container_name: radarpartners-worker
-        command: php bin/console messenger:consume scheduler_default -vv
+        command: sh -c 'test -f bin/console || { echo "Projet non monté, nouvel essai"; sleep 3; exit 1; }; php bin/console app:signals:ingest --since="-14 days" --no-interaction; exec php bin/console messenger:consume scheduler_default -vv'
         networks:
             - default
 
