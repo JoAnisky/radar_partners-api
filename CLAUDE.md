@@ -27,6 +27,7 @@ Une version démo (données fictives) sera exposée sur jonathanlore.fr.
 | `docs/commandes.md` | Aide-mémoire : démarrer, récupérer les offres, modèle local, base, vérifications |
 | `docs/assistant.md` | Chat avec modèle local (Ollama) : architecture, outils, changer de modèle |
 | `docs/import.md` | Import du tableur : règles et décisions d'implémentation |
+| `docs/demo.md` | Démo publique : mode démo, images, manifests K8s, secrets |
 
 ## Stack
 

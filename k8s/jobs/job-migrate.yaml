@@ -1,0 +1,38 @@
+# Lancé par Jenkins à chaque déploiement (pas dans kustomization : un Job est immuable, on le supprime avant de le recréer).
+apiVersion: batch/v1
+kind: Job
+metadata:
+    name: radar-db-migrate
+    namespace: radarpartners-api
+spec:
+    backoffLimit: 3
+    template:
+        spec:
+            restartPolicy: Never
+            containers:
+                - name: migrate
+                  image: joanisky/radarpartners-api:latest
+                  imagePullPolicy: Always
+                  command:
+                      - /bin/bash
+                      - -c
+                      - |
+                          set -e
+                          for i in $(seq 1 30); do
+                            (echo > /dev/tcp/radar-db/5432) 2>/dev/null && break
+                            echo "En attente de PostgreSQL..."
+                            sleep 2
+                          done
+                          php bin/console doctrine:migrations:migrate --no-interaction
+                  envFrom:
+                      - configMapRef:
+                            name: radar-api-config
+                      - secretRef:
+                            name: radar-api-env
+                  resources:
+                      requests:
+                          memory: "128Mi"
+                          cpu: "50m"
+                      limits:
+                          memory: "384Mi"
+                          cpu: "300m"

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: radar-api-ingress
+    annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+spec:
+    tls:
+        - hosts:
+              - api.radar.jonathanlore.fr
+          secretName: api-radar-tls
+    rules:
+        - host: api.radar.jonathanlore.fr
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: radar-api
+                            port:
+                                number: 80
