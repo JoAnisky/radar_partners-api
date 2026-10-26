@@ -1,0 +1,27 @@
+# API de démo locale : base `radar_demo`, mode démo activé. Lancer : make demo-up
+services:
+    radarpartners-api-demo:
+        image: radarpartners-api
+        container_name: radarpartners-api-demo
+        restart: unless-stopped
+        environment:
+            APP_ENV: dev
+            APP_DEBUG: 1
+            APP_DEMO_MODE: "true"
+            DATABASE_URL: postgresql://radar:radar@radarpartners-db:5432/radar_demo?serverVersion=17&charset=utf8
+            CORS_ALLOW_ORIGIN: '^https?://(radardemo\.dev\.local|localhost|127\.0\.0\.1)(:[0-9]+)?$$'
+        volumes:
+            - "./:/var/www/html"
+        command: sh -c 'test -f /var/www/html/bin/console || { echo "Projet non monté, nouvel essai"; sleep 3; exit 1; }; exec apache2-foreground'
+        networks:
+            - web
+            - pgsql_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.radarpartners-api-demo.rule=Host(`radardemo.api.dev.local`)"
+
+networks:
+    web:
+        external: true
+    pgsql_network:
+        external: true
