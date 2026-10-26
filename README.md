@@ -13,7 +13,7 @@ Outil de prospection pour un **développeur freelance fullstack/DevOps** (Symfon
 - **Local (Besançon / Bourgogne-Franche-Comté)** : approche proactive. On part d'un référentiel d'entreprises, qu'on enrichit et qu'on surveille.
 - **National (remote)** : approche réactive. Une entreprise n'est créée que lorsqu'un signal la fait apparaître (offre d'emploi, mission freelance…).
 - **Origine** : un tableur de prospection manuel, dont une même cellule mélangeait date, canal, contexte et résultat. Le modèle de données a été pensé pour corriger ça.
-- **Démo publique** prévue (données fictives uniquement) sur jonathanlore.fr.
+- **Démo publique** en ligne (données fictives uniquement, lecture seule) : https://radar.jonathanlore.fr, détail dans `docs/demo.md`.
 
 ## Stack
 
@@ -101,4 +101,4 @@ Détail, pistes et décisions : [`docs/sources.md`](docs/sources.md).
 
 - Les contacts sont des données B2B : conserver l'origine de chaque donnée, permettre la suppression d'un contact.
 - **Aucune donnée réelle** dans le dépôt, les fixtures, les tests ou les logs ; jamais de secret committé (`.env.local`, identifiants IMAP, clés API).
-- Mode démo (`APP_DEMO_MODE`) : lecture seule, appels LLM simulés ou plafonnés.
+- Mode démo (`APP_DEMO_MODE`) : écritures refusées (403), assistant factice sans modèle. `app:demo:seed` efface la base : il refuse de tourner hors mode démo.

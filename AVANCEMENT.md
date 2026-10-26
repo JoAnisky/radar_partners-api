@@ -1,6 +1,6 @@
 # Avancement — Radar Partenaires
 
-Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
+Dernière mise à jour : 2026-10-26 (démo publique en ligne)
 
 ## MVP
 
@@ -24,7 +24,7 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 
 - Deux repos, `CLAUDE.md` et `AVANCEMENT.md` dans `api/` (pas de repo parent).
 - PHP 8.4 : pas d'extension `imap` → lib IMAP en PHP pur pour la source email.
-- Dockerfiles : cible `dev` uniquement pour l'instant, `prod` à ajouter avec le déploiement K3s. Extension `gd` ajoutée (requise par PhpSpreadsheet).
+- Dockerfiles : cibles `dev`, `test` et `prod` (la démo est déployée sur K3s, voir `docs/demo.md`). Extension `gd` ajoutée (requise par PhpSpreadsheet).
 - Soft delete des entreprises : pas de cascade, `Interaction.company` et `Signal.company` sans `onDelete`.
 - Boîte IMAP : Gmail dédié + mot de passe d'application (Outlook.com OAuth seul, Proton Bridge payant, `contact@` à éviter).
 - Ordre des sources : référentiel Recherche d'entreprises et IMAP d'abord ; Apify, Welcome to the Jungle, HelloWork ensuite (voir `docs/sources.md`).
@@ -46,7 +46,18 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 - [x] **Design, étape 1** : thème sombre émeraude, sidebar et barre du haut, recherche ⌘K, création d'entreprise ; 66 tests front. À vérifier visuellement par l'utilisateur.
 - [x] **Design, étape 2** : accueil de type tableau de bord (`GET /api/stats` + KPI, activité, donut des statuts, avancement, listes) ; la liste des entreprises passe sous `/companies`. 219 tests API, 113 tests front. À vérifier visuellement par l'utilisateur.
 - [~] **Front Nuxt** avec Nuxt UI : liste (filtre « À relancer »), fiche entreprise, formulaire d'interaction et page des signaux sans entreprise écrits ; types vérifiés (`vue-tsc`) et composants compilés par Vite, **pas encore vérifiés visuellement**. ESLint et Vitest (formulaires, pages) en place ; `nuxt typecheck` propre. Reste : essai dans le navigateur. Voir `docs/front.md`.
-- [ ] Authentification avant toute exposition (prod ou démo).
+- [ ] Authentification avant d'exposer la **vraie** instance. Non nécessaire pour la démo, publique et en lecture seule.
+
+## Démo publique (2026-10-20 à 2026-10-26)
+
+En ligne : https://radar.jonathanlore.fr (front) et https://api.radar.jonathanlore.fr (API). Détail, secrets et exploitation : `docs/demo.md`.
+
+- [x] **Données fictives** : `app:demo:seed` (40 entreprises, contacts, interactions, signaux), relançable, refuse de tourner hors mode démo.
+- [x] **Lecture seule** : écritures refusées en 403 (`DemoReadOnlyListener`), boutons grisés et bandeau côté front.
+- [x] **Assistant de démo** : `DemoLlmClient`, 5 questions types sur les vrais outils de lecture, délai de 1,2 s.
+- [x] **Images de production** et manifests Kubernetes (`k8s/`), endpoint `GET /api/health`.
+- [x] **CI/CD** : Jenkinsfiles (tests, build, déploiement, remplissage, health check), Traefik (noindex, limitation de débit), reset hebdomadaire.
+- [ ] Credential Jenkins `kubeconfig` à régénérer avant le 2027-10-16 (expiration du certificat K3s).
 
 ## En attendant les échantillons d'alertes (ordre recommandé)
 
@@ -54,7 +65,7 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 2. [x] **Lecteur IMAP générique** : `ImapMailbox` (lecture seule, mails non lus), `RawEmail`, expéditeur d'origine des transferts manuels, `app:mailbox:list` et `app:mailbox:export`. Reste le marquage « traité » (avec le pipeline). Échantillons Free-Work et LinkedIn analysés : voir `docs/sources.md`.
 3. [x] **Socle du pipeline** : `RawSignal`, `SignalSourceInterface`, `FreeWorkAlertParser`, `StackFilter`, `SignalIngester` et `app:signals:ingest [--since] [--dry-run]` (filtre, déduplication par `fingerprint`, enregistrement) faits et testés sur un vrai mail : 1 signal enregistré en base de dev. Parseurs LinkedIn et HelloWork faits (2026-10-21) ; reste le parseur Indeed (aucun mail reçu). Ingestion planifiée faite (2026-10-15) : chaque jour à 9h avec rattrapage au démarrage, voir `docs/sources.md`. Marquage des mails « traités » volontairement non fait : la déduplication rend la relecture sans danger (à reprendre si la boîte grossit trop).
 4. [~] **Règles éliminatoires** : filtre de stack fait (titre, mots-clés dans `app.stack_keywords`). Restent type d'entreprise et présentiel hors région.
-5. [ ] **Petites dettes** : config PHPStan pour les faux positifs `$id`, fixtures Faker pour la démo.
+5. [~] **Petites dettes** : config PHPStan pour les faux positifs `$id` à faire. Données de la démo : jeu fictif écrit à la main (`src/Demo/`), fait.
 
 ## À faire / points ouverts
 
@@ -64,6 +75,6 @@ Dernière mise à jour : 2026-10-12 (sourcing cadré, IMAP connecté)
 - PHPStan niveau max : faux positifs `property.unusedType` sur `$id` des entités (config Doctrine à ajouter).
 - Vérifier les noms de paramètres de l'API Recherche d'entreprises (documentation officielle illisible par outil).
 - Outils PHPStan, PHP-CS-Fixer, ESLint : installés (API) ou à installer (front), pas encore configurés.
-- Identifiants PostgreSQL de dev en clair (`radar`/`radar`) : à sortir avant la prod.
+- Identifiants PostgreSQL de dev en clair (`radar`/`radar`) : sortis pour la démo (secrets Kubernetes via Jenkins) ; à reprendre pour la vraie instance.
 - CORS (`nelmio/cors-bundle`) à prévoir quand le navigateur appellera l'API.
 - Interface PostgreSQL : Adminer partagé (`../../adminer-pgsql`), `http://adminer.dev.local` ; réseau externe `pgsql_network` à créer une fois (`docker network create pgsql_network`).

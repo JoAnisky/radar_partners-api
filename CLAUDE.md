@@ -13,7 +13,7 @@ Deux périmètres :
 - **Local (Besançon / Bourgogne-Franche-Comté)** : approche proactive. On part d'un référentiel d'entreprises, qu'on enrichit et qu'on surveille.
 - **National (remote)** : approche réactive. Une entreprise n'est créée que lorsqu'un signal la fait apparaître (offre d'emploi, mission freelance…).
 
-Une version démo (données fictives) sera exposée sur jonathanlore.fr.
+Une version démo (données fictives, lecture seule) est en ligne sur radar.jonathanlore.fr (`docs/demo.md`).
 
 ## Documentation détaillée (à lire à la demande)
 
@@ -63,7 +63,7 @@ Pièges connus :
 - **Sources** : ne jamais scraper LinkedIn ni une plateforme dont les CGU l'interdisent ; vérifier les CGU avant d'ajouter une source (détail : `docs/sources.md`).
 - **Soft delete** : une `Company` n'est jamais supprimée (`archivedAt`), son historique non plus.
 - **Données personnelles** : contacts B2B, origine de chaque donnée conservée, suppression d'un contact possible. Aucune donnée réelle dans le dépôt, les fixtures, les tests ou les logs.
-- **Démo publique** : fixtures Faker uniquement ; `APP_DEMO_MODE` = lecture seule, appels LLM simulés ou plafonnés.
+- **Démo publique** : données fictives écrites à la main (`src/Demo/`), jamais de données réelles ; `APP_DEMO_MODE` = lecture seule, assistant factice.
 
 ## Conventions
 
