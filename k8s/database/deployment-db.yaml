@@ -20,9 +20,12 @@ spec:
                   env:
                       - name: POSTGRES_DB
                         value: radar
+                      # Secret créé par Jenkins : clés `user` et `password`
                       - name: POSTGRES_USER
-                        value: radar
-                      # Secret créé par Jenkins : clé `password`
+                        valueFrom:
+                            secretKeyRef:
+                                name: radar-db-secret
+                                key: user
                       - name: POSTGRES_PASSWORD
                         valueFrom:
                             secretKeyRef:
@@ -37,7 +40,7 @@ spec:
                         mountPath: /var/lib/postgresql/data
                   readinessProbe:
                       exec:
-                          command: ["pg_isready", "-U", "radar", "-d", "radar"]
+                          command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
                       initialDelaySeconds: 5
                       periodSeconds: 10
                   resources:

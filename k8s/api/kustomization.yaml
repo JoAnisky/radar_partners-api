@@ -5,5 +5,7 @@ resources:
     - configmap.yaml
     - deployment-api.yaml
     - service-api.yaml
+    - middleware.yaml
     - ingress-api.yaml
+    - ingress-api-chat.yaml
     - cronjob-demo-reset.yaml
