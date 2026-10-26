@@ -2,3 +2,13 @@
 .idea
 var
 vendor
+.env.local
+.env.*.local
+config/assistant/profile.md
+tests
+docs
+.phpunit.cache
+.php-cs-fixer.cache
+docker-compose*.yml
+k8s
+Jenkinsfile

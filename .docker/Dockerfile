@@ -28,3 +28,15 @@ FROM base AS dev
 RUN adduser --uid 1000 --disabled-password --gecos "" dev \
     && chown -R dev:dev /var/www/html
 USER dev
+
+FROM base AS deps
+COPY composer.json composer.lock symfony.lock ./
+RUN composer install --no-dev --prefer-dist --no-scripts --no-autoloader --no-progress
+
+FROM deps AS prod
+ENV APP_ENV=prod \
+    APP_DEBUG=0
+COPY . .
+RUN composer dump-autoload --no-dev --classmap-authoritative --no-scripts \
+    && APP_SECRET=build-placeholder php bin/console cache:warmup \
+    && chown -R www-data:www-data var
