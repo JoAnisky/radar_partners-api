@@ -97,6 +97,16 @@ La base de dev contient des données réelles : ne rien réinitialiser ni suppri
 
 Règles du dépôt : commits courts en anglais, un repo = ses propres commits, jamais de secret (`.env.local`, `profile.md`) committé.
 
+## Données de la démo
+
+`app:demo:seed` **efface toute la base** puis la remplit de données fictives (`src/Demo/DemoDataset.php`, relançable). Elle refuse de tourner sans `APP_DEMO_MODE=true`. En local, toujours sur une base à part, jamais la base de dev :
+
+```
+docker exec -e DATABASE_URL='postgresql://radar:radar@radarpartners-db:5432/radar_demo?serverVersion=17&charset=utf8' -e APP_DEMO_MODE=true radarpartners-api php bin/console app:demo:seed
+```
+
+(créer `radar_demo` une fois : `doctrine:database:create` puis `doctrine:migrations:migrate` avec le même `DATABASE_URL`.)
+
 ## Dépannage rapide
 
 | Symptôme | Piste |
