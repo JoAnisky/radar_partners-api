@@ -33,10 +33,15 @@ FROM base AS deps
 COPY composer.json composer.lock symfony.lock ./
 RUN composer install --no-dev --prefer-dist --no-scripts --no-autoloader --no-progress
 
+FROM deps AS test
+RUN composer install --prefer-dist --no-scripts --no-progress
+COPY . .
+
 FROM deps AS prod
 ENV APP_ENV=prod \
     APP_DEBUG=0
 COPY . .
 RUN composer dump-autoload --no-dev --classmap-authoritative --no-scripts \
     && APP_SECRET=build-placeholder php bin/console cache:warmup \
+    && rm -rf tests docs \
     && chown -R www-data:www-data var
