@@ -9,6 +9,7 @@
 parameters:
     env(APP_DEMO_MODE): 'false'
     app.demo_mode: '%env(bool:APP_DEMO_MODE)%'
+    app.demo_chat_delay_ms: 1200
     app.recontact_delay: 'P6M'
     app.stack_keywords: [symfony, php, laravel, wordpress, vue, nuxt, docker, kubernetes, k3s, devops]
     app.other_stack_keywords: [java, net, dotnet, python, angular, react, node, nodejs, js, javascript, typescript, golang, go, ruby, rails, django, scala, kotlin, swift, ios, android, flutter, sap, salesforce, odoo, abap, cobol, rust, c, data, mobile]
@@ -26,3 +27,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Démo : faux modèle aux réponses préparées ; sinon Ollama.
+    App\Llm\LlmClientInterface:
+        factory: ['@App\Llm\LlmClientFactory', 'create']
+
+when@test:
+    parameters:
+        app.demo_chat_delay_ms: 0

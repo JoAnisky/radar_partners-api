@@ -28,4 +28,8 @@ Les petits modèles comparent mal les dates : `get_company` fournit les écarts 
 
 ## Pas encore fait
 
-Réponse en flux (l'API attend la réponse complète), outils d'écriture (noter une interaction, changer un statut : prévoir une confirmation), bouton « Rédiger une approche » sur la fiche entreprise, mode démo (faux `DemoLlmClient` aux réponses préparées, lecture seule, données Faker : prévu pour la démo en ligne ; l'outil réel reste local), second fournisseur (Claude) derrière `LlmClientInterface`.
+Réponse en flux (l'API attend la réponse complète), outils d'écriture (noter une interaction, changer un statut : prévoir une confirmation), bouton « Rédiger une approche » sur la fiche entreprise, second fournisseur (Claude) derrière `LlmClientInterface`.
+
+## Mode démo
+
+Avec `APP_DEMO_MODE=true`, `LlmClientFactory` fournit `DemoLlmClient` (`src/Llm/Demo/`) à la place d'Ollama : pas de GPU, pas de modèle. Il reconnaît cinq questions (priorités, relances en retard, dernières offres, résumé d'une fiche, rédaction d'un mail / message LinkedIn / script d'appel) par mots-clés, appelle les **vrais outils de lecture** (`search_companies`, `list_signals`, `get_company`) puis met leur résultat en forme (`DemoReplies`). L'entreprise visée est trouvée par son nom, son `id` ou la fiche ouverte. Toute autre question reçoit la liste des questions possibles. Le front propose ces questions en suggestions (`ChatBubble`, `useDemo`).
