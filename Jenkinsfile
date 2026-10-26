@@ -186,7 +186,7 @@ pipeline {
                         waitUntil {
                             script {
                                 def response = sh(
-                                    script: 'curl -s -o /dev/null -w "%{http_code}" https://api.radar.jonathanlore.fr/api/health',
+                                    script: 'curl -s -o /dev/null -w "%{http_code}" https://api.radar.jonathanlore.fr/api/health || true',
                                     returnStdout: true
                                 ).trim()
 
