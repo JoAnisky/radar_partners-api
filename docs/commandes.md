@@ -56,6 +56,7 @@ L'ingestion tourne **toute seule chaque jour à 9h** (Europe/Paris) et se rattra
 | Décharger le modèle de la mémoire du GPU | `docker exec radarpartners-llm ollama stop granite4.1:8b` |
 | Installer un autre modèle | `docker exec radarpartners-llm ollama pull <nom>` (choisir un modèle avec la catégorie « tools » sur ollama.com) |
 | Supprimer un modèle | `docker exec radarpartners-llm ollama rm <nom>` |
+| Comparer des modèles sur les mêmes questions | `docker exec radarpartners-api php bin/console app:llm:bench granite4.1:8b gemma4:12b` (plusieurs minutes ; `--company=<id>` pour choisir la fiche résumée) |
 | Voir l'occupation du GPU | `nvidia-smi` |
 
 - **Changer de modèle** : après un `pull`, modifier `OLLAMA_MODEL` dans `api/.env.local` (valeur par défaut dans `.env`).

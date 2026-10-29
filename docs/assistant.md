@@ -22,9 +22,14 @@ L'assistant s'appelle **Amelio** (nom défini dans `ASSISTANT_NAME`, `front/app/
 
 Les petits modèles comparent mal les dates : `get_company` fournit les écarts déjà calculés en PHP (`daysAgo`, `daysSinceLastInteraction`, `nextActionOverdueByDays`, `recontactOverdueByDays`), les dates écrites dans les notes (`NoteDateExtractor` : `17.09.2026`, `17/09/2026`, `2026-09-17`, `17 septembre 2026` ; sans année, elles sont ignorées) avec leur position par rapport à aujourd'hui, et des `alerts` en français prêtes à relayer (rendez-vous noté dans la dernière interaction, passé, sans suite). Constat du 2026-10-15 : une simple consigne dans l'invite ou un champ `when` n'ont pas suffi (le modèle répétait « il reste à attendre le rendez-vous ») ; l'alerte explicite a fonctionné. Règle : ce que le modèle doit absolument respecter se calcule en PHP et se formule en phrase.
 
-## Modèle essayé
+## Modèles essayés
 
-`granite4.1:8b` (IBM, 5,3 Go, tient dans 8 Go de VRAM à 100 % GPU, contexte 8192). Appelle correctement les outils (essais du 2026-10-15) ; ses rédactions sont correctes mais il extrapole parfois (formules d'accroche non fondées) : relire avant d'envoyer.
+- `granite4.1:8b` (IBM, 5,3 Go, tient dans 8 Go de VRAM, contexte 8192) : appelle les outils, mais sur « quelles ESN as-tu ? » il ajoute de lui-même `status: TO_CONTACT`, ne trouve rien et conclut que la base est vide (0 réussite sur 5 passes). Résumés longs, avec rubriques ; il extrapole parfois (formules d'accroche non fondées) : relire avant d'envoyer.
+- `gemma4:12b` (8 Go, déborde un peu de la VRAM) : un seul appel sans filtre, listes propres, résumés de 2 paragraphes. Essais du 2026-10-29 : recherche réussie 5 fois sur 6 (échec : recherche par mots-clés exacts, « aucune ESN » à tort). Vitesse comparable à granite (20 à 130 s pour une question, très variable).
+
+**Comparer** : `php bin/console app:llm:bench <modèle> <modèle>…` pose quatre questions (recherche, signaux, résumé de la fiche la mieux classée, société inexistante) avec la vraie boucle de l'assistant, et affiche durée, outils appelés et réponse. À relancer plusieurs fois : un seul passage ne suffit pas. Aucun des deux n'invente de réponse à la question piège (toutes les passes).
+
+**Leçons sur les outils** : décrire explicitement ce que `query` accepte (nom, ville, SIREN, pas un type d'entreprise) et dire que `status` n'est à renseigner que sur demande. Dans `get_company`, `scoreExplanation` est renvoyé sous la forme « +45 points : … » : sans le mot « points », gemma lisait « 45 offres ». Le front reçoit toujours le format d'origine.
 
 ## Pas encore fait
 
