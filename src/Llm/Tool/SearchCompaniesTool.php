@@ -23,7 +23,7 @@ final readonly class SearchCompaniesTool implements ChatToolInterface
 
     public function getDescription(): string
     {
-        return 'Recherche des entreprises dans la base, classées par score décroissant. Les partenaires sont exclus sauf si on demande le statut PARTNER.';
+        return 'Liste les entreprises de la base, classées par score décroissant. Sans paramètre, renvoie les mieux classées : à utiliser pour les demandes générales (« les plus intéressantes », « les ESN », « les agences »), car le type d\'entreprise ne se filtre pas. Les partenaires sont exclus sauf si on demande le statut PARTNER.';
     }
 
     public function getParameters(): array
@@ -31,8 +31,8 @@ final readonly class SearchCompaniesTool implements ChatToolInterface
         return [
             'type' => 'object',
             'properties' => [
-                'query' => ['type' => 'string', 'description' => 'Texte à chercher dans le nom, la ville ou le SIREN ; un sigle (BWA) retrouve « Business Web Agence » (facultatif)'],
-                'status' => ['type' => 'string', 'enum' => array_column(PipelineStatus::cases(), 'value'), 'description' => 'Statut dans le pipeline (facultatif)'],
+                'query' => ['type' => 'string', 'description' => 'Uniquement un nom, une ville ou un SIREN ; un sigle (BWA) retrouve « Business Web Agence ». Ne pas y mettre un type d\'entreprise (« agence », « ESN ») ni plusieurs mots-clés (facultatif)'],
+                'status' => ['type' => 'string', 'enum' => array_column(PipelineStatus::cases(), 'value'), 'description' => 'Statut dans le pipeline, à n\'indiquer que si l\'utilisateur le demande (facultatif)'],
                 'due' => ['type' => 'boolean', 'description' => 'true pour ne garder que les entreprises à relancer'],
                 'limit' => ['type' => 'integer', 'description' => 'Nombre maximum de résultats (10 par défaut, 20 au plus)'],
             ],

@@ -55,6 +55,10 @@ final readonly class GetCompanyTool implements ChatToolInterface
         $interactions = \array_slice($this->interactions->findByCompany($company), 0, self::MAX_INTERACTIONS);
         $detail = $this->presenter->detail($company, $interactions, $this->signals->findByCompany($company));
         unset($detail['parentId'], $detail['createdAt'], $detail['archived']);
+        // « +45 1 offre… » est lu comme un nombre d'offres : on précise que ce sont des points.
+        if (\is_string($detail['scoreExplanation'])) {
+            $detail['scoreExplanation'] = preg_replace('/^([+-]\d+) /m', '$1 points : ', $detail['scoreExplanation']);
+        }
 
         // Les petits modèles comparent mal les dates : on leur donne les écarts déjà calculés.
         $latest = $interactions[0] ?? null;
