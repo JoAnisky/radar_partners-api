@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Mailbox\ImapMailbox;
 use App\Signal\IngestOutcome;
 use App\Signal\SignalIngester;
 use App\Signal\SignalSourceInterface;
@@ -20,6 +21,7 @@ final readonly class IngestSignalsCommand
         #[AutowireIterator('app.signal_source')]
         private iterable $sources,
         private SignalIngester $ingester,
+        private ImapMailbox $mailbox,
         private EntityManagerInterface $em,
         private LoggerInterface $logger,
     ) {
@@ -55,6 +57,8 @@ final readonly class IngestSignalsCommand
             throw $e;
         }
 
+        $moved = $dryRun ? 0 : $this->mailbox->moveProcessed();
+
         $this->logger->info('Ingestion des signaux', $counts + ['dryRun' => $dryRun]);
 
         if ([] !== $created) {
@@ -62,10 +66,11 @@ final readonly class IngestSignalsCommand
         }
 
         $io->success(sprintf(
-            '%d créé(s), %d déjà connu(s), %d écarté(s) par le filtre de stack%s.',
+            '%d créé(s), %d déjà connu(s), %d écarté(s) par le filtre de stack, %d mail(s) rangé(s)%s.',
             $counts['Created'],
             $counts['Duplicate'],
             $counts['Filtered'],
+            $moved,
             $dryRun ? ' (dry-run, rien écrit)' : '',
         ));
 

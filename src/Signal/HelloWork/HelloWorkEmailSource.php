@@ -22,6 +22,7 @@ final readonly class HelloWorkEmailSource implements SignalSourceInterface
             foreach (HelloWorkAlertParser::SENDERS as $sender) {
                 if ($email->isFrom($sender)) {
                     yield from $this->parser->parse($email);
+                    $this->mailbox->markProcessed($email);
                     break;
                 }
             }

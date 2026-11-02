@@ -8,10 +8,18 @@ use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Message;
 
-/** Lecture seule de la boîte dédiée : les mails restent non lus. */
+/** Boîte dédiée : les mails restent non lus ; les mails traités sont rangés dans le libellé « Alertes emploi ». */
 final class ImapMailbox
 {
+    public const PROCESSED_FOLDER = 'Alertes emploi';
+
     private ?Client $client = null;
+
+    /** @var array<int, Message> mails lus, par UID */
+    private array $messages = [];
+
+    /** @var list<int> */
+    private array $processed = [];
 
     public function __construct(
         #[Autowire(env: 'IMAP_HOST')] private readonly string $host,
@@ -35,9 +43,31 @@ final class ImapMailbox
 
         foreach ($query->get() as $message) {
             if ($message instanceof Message) {
-                yield $this->toRawEmail($message);
+                $email = $this->toRawEmail($message);
+                $this->messages[$email->uid] = $message;
+
+                yield $email;
             }
         }
+    }
+
+    public function markProcessed(RawEmail $email): void
+    {
+        $this->processed[$email->uid] = $email->uid;
+    }
+
+    /** À appeler une fois les signaux enregistrés. Retourne le nombre de mails déplacés. */
+    public function moveProcessed(): int
+    {
+        $moved = 0;
+        foreach ($this->processed as $uid) {
+            if (null !== ($this->messages[$uid] ?? null)?->move(self::PROCESSED_FOLDER)) {
+                ++$moved;
+            }
+        }
+        $this->processed = [];
+
+        return $moved;
     }
 
     private function client(): Client

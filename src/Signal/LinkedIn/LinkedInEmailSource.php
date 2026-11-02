@@ -21,6 +21,7 @@ final readonly class LinkedInEmailSource implements SignalSourceInterface
         foreach ($this->mailbox->fetch('INBOX', $since) as $email) {
             if ($email->isFrom(LinkedInAlertParser::SENDER)) {
                 yield from $this->parser->parse($email);
+                $this->mailbox->markProcessed($email);
             }
         }
     }
