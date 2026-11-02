@@ -85,6 +85,6 @@ CGU lues le 2026-10-13 (version du 14/09/2026, lecture automatisée à confirmer
 
 ## Prochaines étapes
 
-1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Marquage des mails traités non implémenté : la déduplication par `fingerprint` suffit (`app:signals:ingest` relit les mails depuis `--since`).
+1. ~~Lecteur IMAP~~ fait : `ImapMailbox` (lecture seule), `app:mailbox:list`, `app:mailbox:export`. Les mails reconnus par un parseur sont déplacés vers le libellé « Alertes emploi » après le commit (jamais en dry-run) ; la déduplication par `fingerprint` reste le garde-fou.
 2. Un parseur par source, testé avec des fixtures fictives (jamais de vrais mails dans le dépôt) : Free-Work fait (`src/Signal/FreeWork/`) ; aperçu avec `app:signals:preview` (rien n'est enregistré).
 3. Fait : `app:signals:ingest` (filtre de stack, déduplication, enregistrement). Parseur LinkedIn fait (2026-10-15). Reste : parseur Indeed dès le premier vrai mail. Ingestion planifiée : faite, voir plus haut. Offres sans entreprise : résolution manuelle (décidé).
