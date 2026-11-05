@@ -1,5 +1,26 @@
 pipeline {
-    agent none
+    agent {
+        kubernetes {
+            defaultContainer 'tools'
+            yaml '''
+                spec:
+                  containers:
+                    - name: tools
+                      image: joanisky/jenkins-with-docker:latest
+                      imagePullPolicy: IfNotPresent
+                      command: [cat]
+                      tty: true
+                      volumeMounts:
+                        - name: docker-socket
+                          mountPath: /var/run/docker.sock
+                  volumes:
+                    - name: docker-socket
+                      hostPath:
+                        path: /var/run/docker.sock
+                        type: Socket
+            '''
+        }
+    }
 
     environment {
         APP_NAME = "radarpartners-api"
@@ -11,7 +32,6 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            agent any
             steps {
                 checkout scm
                 script {
@@ -21,7 +41,6 @@ pipeline {
             }
         }
         stage('Tests') {
-            agent any
             steps {
                 sh '''
                     NET=ci-radar-api-${BUILD_NUMBER}
@@ -58,7 +77,6 @@ pipeline {
             }
         }
         stage('Build & Push Docker Image') {
-            agent any
             steps {
                 withCredentials([
                     usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')
@@ -80,7 +98,6 @@ pipeline {
             }
         }
         stage('Deploy Secrets') {
-            agent any
             when { expression { env.GIT_BRANCH == 'origin/main' } }
             steps {
                 withCredentials([
@@ -110,7 +127,6 @@ pipeline {
             }
         }
         stage('Deploy to Kubernetes') {
-            agent any
             when { expression { env.GIT_BRANCH == 'origin/main' } }
             steps {
                 withCredentials([
@@ -142,7 +158,6 @@ pipeline {
             }
         }
         stage('Seed Demo Data') {
-            agent any
             when { expression { env.GIT_BRANCH == 'origin/main' } }
             steps {
                 withCredentials([
@@ -160,7 +175,6 @@ pipeline {
             }
         }
         stage('Verify Deployment') {
-            agent any
             when { expression { env.GIT_BRANCH == 'origin/main' } }
             steps {
                 withCredentials([
@@ -178,7 +192,6 @@ pipeline {
             }
         }
         stage('Health Check') {
-            agent any
             when { expression { env.GIT_BRANCH == 'origin/main' } }
             steps {
                 script {
@@ -207,10 +220,8 @@ pipeline {
     }
     post {
         always {
-            node('built-in') {
-                sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
-                sh "docker rmi ${DOCKER_IMAGE}:latest || true"
-            }
+            sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
+            sh "docker rmi ${DOCKER_IMAGE}:latest || true"
         }
         success {
             withCredentials([string(credentialsId: 'discord-webhook-url', variable: 'DISCORD_URL')]) {
