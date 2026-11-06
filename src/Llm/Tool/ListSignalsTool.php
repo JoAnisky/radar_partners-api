@@ -21,7 +21,7 @@ final readonly class ListSignalsTool implements ChatToolInterface
 
     public function getDescription(): string
     {
-        return "Liste les dernières offres détectées (missions freelance, offres d'emploi), les plus récentes d'abord. toReview=true signale une offre dont le titre ne nomme aucune technologie.";
+        return "Liste les dernières offres détectées (missions freelance, offres d'emploi), les plus récentes d'abord. `url` est le lien d'origine de l'offre, à donner tel quel. toReview=true signale une offre dont le titre ne nomme aucune technologie.";
     }
 
     public function getParameters(): array
