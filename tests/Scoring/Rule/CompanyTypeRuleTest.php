@@ -27,4 +27,9 @@ final class CompanyTypeRuleTest extends RuleTestCase
     {
         self::assertSame([], self::summary(new CompanyTypeRule(), new Company('A')));
     }
+
+    public function testIndividualScoresNothing(): void
+    {
+        self::assertSame([], self::summary(new CompanyTypeRule(), (new Company('A'))->setType(CompanyType::Individual)));
+    }
 }

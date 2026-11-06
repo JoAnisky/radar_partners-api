@@ -6,7 +6,7 @@ namespace App\Llm\Demo;
 final class DemoReplies
 {
     private const STATUSES = ['TO_CONTACT' => 'à contacter', 'CONTACTED' => 'contactée', 'FOLLOW_UP' => 'à suivre', 'MEETING' => 'en rendez-vous', 'PARTNER' => 'partenaire', 'ON_HOLD' => 'en attente', 'EXCLUDED' => 'exclue'];
-    private const TYPES = ['ESN' => 'ESN', 'WEB_AGENCY' => 'agence web', 'COM_AGENCY' => 'agence de communication', 'END_CLIENT' => 'client final', 'UNKNOWN' => 'type inconnu'];
+    private const TYPES = ['ESN' => 'ESN', 'WEB_AGENCY' => 'agence web', 'COM_AGENCY' => 'agence de communication', 'END_CLIENT' => 'client final', 'INDIVIDUAL' => 'particulier', 'UNKNOWN' => 'type inconnu'];
     private const CHANNELS = ['PHONE' => 'téléphone', 'EMAIL' => 'email', 'IN_PERSON' => 'en personne', 'LINKEDIN' => 'LinkedIn', 'WEB_FORM' => 'formulaire web'];
     private const OUTCOMES = ['NO_ANSWER' => 'pas de réponse', 'VOICEMAIL' => 'répondeur', 'NOBODY_ON_SITE' => 'personne sur place', 'NO_NEED' => 'pas de besoin', 'NO_FREELANCE_POLICY' => 'ne travaille pas avec des freelances', 'JUST_HIRED' => 'vient d\'embaucher', 'MEETING_SCHEDULED' => 'rendez-vous fixé', 'POSITIVE' => 'échange positif', 'OTHER' => 'autre'];
 

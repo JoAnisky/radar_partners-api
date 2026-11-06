@@ -8,5 +8,6 @@ enum CompanyType: string
     case WebAgency = 'WEB_AGENCY';
     case ComAgency = 'COM_AGENCY';
     case EndClient = 'END_CLIENT';
+    case Individual = 'INDIVIDUAL';
     case Unknown = 'UNKNOWN';
 }

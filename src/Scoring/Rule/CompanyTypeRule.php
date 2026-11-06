@@ -20,6 +20,7 @@ final class CompanyTypeRule implements ScoringRuleInterface
             CompanyType::Esn => [new ScoreContribution(self::TARGET_POINTS, 'ESN')],
             CompanyType::WebAgency => [new ScoreContribution(self::TARGET_POINTS, 'Agence web')],
             CompanyType::ComAgency => [new ScoreContribution(self::TARGET_POINTS, 'Agence de communication')],
+            CompanyType::Individual,
             CompanyType::Unknown => [],
         };
     }

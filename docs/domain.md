@@ -9,7 +9,7 @@ Le modèle découle des limites du tableur de prospection actuel, où une même 
 - `name`, `website`, `address`, `postalCode`, `city`
 - `phone` (standard, normalisé E.164, nullable), `email` (générique, nullable)
 - `nafCode`, `headcountRange`
-- `type` : enum `CompanyType` → `ESN`, `WEB_AGENCY`, `COM_AGENCY`, `END_CLIENT`, `UNKNOWN`
+- `type` : enum `CompanyType` → `ESN`, `WEB_AGENCY`, `COM_AGENCY`, `END_CLIENT`, `INDIVIDUAL` (particulier, sans effet sur le score), `UNKNOWN`
 - `scope` : enum `Scope` → `LOCAL`, `NATIONAL`
 - `parent` : `?Company` (filiales et agences d'un groupe, ex. bureau local d'un siège ailleurs)
 - `status` : enum `PipelineStatus` → `TO_CONTACT`, `CONTACTED`, `FOLLOW_UP`, `MEETING`, `PARTNER`, `ON_HOLD`, `EXCLUDED`
