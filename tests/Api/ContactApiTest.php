@@ -3,6 +3,7 @@
 namespace App\Tests\Api;
 
 use App\Entity\Contact;
+use App\Enum\InteractionOutcome;
 
 final class ContactApiTest extends ApiTestCase
 {
@@ -219,5 +220,37 @@ final class ContactApiTest extends ApiTestCase
         foreach (['sort=password', 'direction=sideways', 'perPage=0', 'perPage=101', 'page=0'] as $query) {
             self::assertSame(422, $this->get('/api/contacts?'.$query)[0], $query);
         }
+    }
+
+    public function testMoveReattachesContactAndItsInteractions(): void
+    {
+        $from = $this->company('Jane Doe');
+        $to = $this->company('Acme');
+        $contact = new Contact($from, 'Jane Doe');
+        $this->em->persist($contact);
+        $moved = $this->interaction($from, '2026-10-01', null, InteractionOutcome::Positive);
+        $moved->setContact($contact);
+        $this->interaction($from, '2026-09-01');
+        $this->em->flush();
+
+        [$status, $body] = $this->request('POST', sprintf('/api/contacts/%d/move', $contact->getId()), ['companyId' => $to->getId()]);
+
+        self::assertSame(200, $status);
+        self::assertSame($to->getId(), self::at($body, 'company.id'));
+        $target = $this->get('/api/companies/'.$to->getId())[1];
+        self::assertSame('Jane Doe', self::at($target, 'contacts.0.fullName'));
+        self::assertCount(1, self::arr($target, 'interactions'));
+        self::assertCount(1, self::arr($this->get('/api/companies/'.$from->getId())[1], 'interactions'));
+        self::assertSame([], self::arr($this->get('/api/companies/'.$from->getId())[1], 'contacts'));
+    }
+
+    public function testMoveRejectsUnknownOrSameCompany(): void
+    {
+        $contact = $this->contact('Jane', 'Acme');
+        $uri = sprintf('/api/contacts/%d/move', $contact->getId());
+
+        self::assertSame(422, $this->request('POST', $uri, ['companyId' => 999999])[0]);
+        self::assertSame(422, $this->request('POST', $uri, [])[0]);
+        self::assertSame(422, $this->request('POST', $uri, ['companyId' => $contact->getCompany()->getId()])[0]);
     }
 }

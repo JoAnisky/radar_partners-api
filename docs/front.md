@@ -34,6 +34,7 @@ Modèle visuel : une capture de tableau de bord « Apex » en mode sombre (non v
 | `pages/contacts.vue` | Onglet Contacts : tous les contacts avec leur entreprise (liens vers la fiche), recherche, tri, pagination |
 | `layouts/default.vue` | Sidebar, barre du haut, recherche ⌘K, modal de création |
 | `components/CompanyCreateModal.vue` | Création d'une entreprise (nom, type, zone, ville, site) |
+| `components/ContactMove.vue` | Bouton « Rattacher » d'un contact : recherche d'une entreprise (ou création) puis déplacement, avec ses interactions |
 | `components/ContactForm.vue` | Ajout et modification d'un contact ; ajout, modification et suppression (avec confirmation) depuis la carte Contacts |
 | `components/CompanyForm.vue` | Modification des informations d'une entreprise (bouton « Modifier » de la carte Informations) ; n'envoie que les champs changés |
 | `components/InteractionForm.vue` | Saisie ou modification d'une interaction (bouton « Modifier » dans l'historique) ; les dates inchangées ne sont pas renvoyées |

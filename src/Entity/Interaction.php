@@ -63,6 +63,13 @@ class Interaction
         return $this->company;
     }
 
+    public function setCompany(Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
     public function getContact(): ?Contact
     {
         return $this->contact;

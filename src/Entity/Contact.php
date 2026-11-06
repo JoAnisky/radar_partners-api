@@ -58,6 +58,15 @@ class Contact
         return $this->company;
     }
 
+    public function moveTo(Company $company): static
+    {
+        $this->company->removeContact($this);
+        $this->company = $company;
+        $company->addContact($this);
+
+        return $this;
+    }
+
     public function getFullName(): string
     {
         return $this->fullName;

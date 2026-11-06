@@ -52,6 +52,10 @@ Paramètres : `q` (nom, rôle, email, nom d'entreprise ; sans casse ni accents),
 
 Contact d'une entreprise : `fullName` (obligatoire, non vide), `role`, `phone` (normalisé en E.164, `422` si invalide), `email` (minuscules, validé), `linkedinUrl` (`https://` ajouté si absent), `notes`. Création : `201` avec le contact ; modification partielle (`null` ou chaîne vide pour vider, `fullName` ne peut pas être vidé) ; champ inconnu ou valeur invalide : `422`.
 
+### `POST /api/contacts/{id}/move`
+
+Rattache le contact à une autre entreprise (`{ "companyId": 7 }`) : cas d'un contact créé d'abord dans une fiche de type `INDIVIDUAL`. Ses interactions le suivent, le statut et le score des deux entreprises sont recalculés (un statut posé à la main est conservé). Répond `200` avec le contact et sa nouvelle `company` ; `422` si l'entreprise est inconnue ou identique. La fiche d'origine n'est pas supprimée (soft delete des entreprises).
+
 `DELETE` (suppression d'un contact, exigence RGPD) répond `204` : le contact disparaît, **ses interactions sont conservées** et simplement détachées (`contactId` à `null`, clé étrangère `ON DELETE SET NULL`). Un texte libre (notes d'interaction) qui citerait la personne n'est pas modifié.
 
 ### `PATCH /api/interactions/{id}`
