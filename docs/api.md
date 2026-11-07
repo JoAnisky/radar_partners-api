@@ -13,6 +13,7 @@ Liste paginée. Réponse : `{ items, total, page, perPage }` ; chaque item : id,
 | `q` | texte, insensible à la casse et aux accents (nom, ville, SIREN) | |
 | `status` | `TO_CONTACT`, `CONTACTED`, `FOLLOW_UP`, `MEETING`, `PARTNER`, `ON_HOLD`, `EXCLUDED` | |
 | `scope` | `LOCAL`, `NATIONAL` | |
+| `type` | `ESN`, `WEB_AGENCY`, `COM_AGENCY`, `END_CLIENT`, `INDIVIDUAL`, `UNKNOWN` | |
 | `due` | `1` : relance dépassée, ou prochaine action échue sur la dernière interaction | |
 | `archived` | `1` : seulement les archivées (sinon exclues) | |
 | `hidePartners` | `1` : exclut les `PARTNER` (sans effet si `status` est donné) | |

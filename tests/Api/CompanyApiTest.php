@@ -3,6 +3,7 @@
 namespace App\Tests\Api;
 
 use App\Entity\Contact;
+use App\Enum\CompanyType;
 use App\Enum\PipelineStatus;
 
 final class CompanyApiTest extends ApiTestCase
@@ -29,6 +30,15 @@ final class CompanyApiTest extends ApiTestCase
 
         self::assertSame(['Visible'], self::names($this->get('/api/companies')[1]));
         self::assertSame(['Archived'], self::names($this->get('/api/companies?archived=1')[1]));
+    }
+
+    public function testFiltersByType(): void
+    {
+        $this->company('Agency')->setType(CompanyType::WebAgency);
+        $this->company('Shop')->setType(CompanyType::EndClient);
+        $this->em->flush();
+
+        self::assertSame(['Shop'], self::names($this->get('/api/companies?type=END_CLIENT')[1]));
     }
 
     public function testFiltersByStatus(): void
@@ -102,7 +112,7 @@ final class CompanyApiTest extends ApiTestCase
 
     public function testInvalidParametersAreRejected(): void
     {
-        foreach (['sort=password', 'status=NOPE', 'perPage=1000', 'page=0', 'direction=sideways'] as $query) {
+        foreach (['sort=password', 'status=NOPE', 'type=NOPE', 'perPage=1000', 'page=0', 'direction=sideways'] as $query) {
             self::assertSame(422, $this->get('/api/companies?'.$query)[0], $query);
         }
     }

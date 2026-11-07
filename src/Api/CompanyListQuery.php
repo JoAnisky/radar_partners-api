@@ -2,6 +2,7 @@
 
 namespace App\Api;
 
+use App\Enum\CompanyType;
 use App\Enum\PipelineStatus;
 use App\Enum\Scope;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,6 +13,7 @@ final readonly class CompanyListQuery
         public ?string $q = null,
         public ?PipelineStatus $status = null,
         public ?Scope $scope = null,
+        public ?CompanyType $type = null,
         /** Entreprises à relancer : date de relance dépassée ou prochaine action échue. */
         public bool $due = false,
         public bool $archived = false,

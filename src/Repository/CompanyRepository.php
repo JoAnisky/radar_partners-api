@@ -87,6 +87,10 @@ class CompanyRepository extends ServiceEntityRepository
             $qb->andWhere('c.status <> :partner')->setParameter('partner', PipelineStatus::Partner);
         }
 
+        if (null !== $query->type) {
+            $qb->andWhere('c.type = :type')->setParameter('type', $query->type);
+        }
+
         if (null !== $query->scope) {
             $qb->andWhere('c.scope = :scope')->setParameter('scope', $query->scope);
         }
