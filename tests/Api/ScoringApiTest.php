@@ -48,7 +48,7 @@ final class ScoringApiTest extends ApiTestCase
         self::assertStringContainsString('Total : 30', self::str($body, 'scoreExplanation'));
     }
 
-    public function testChangingTheTypeToEndClientEliminatesTheCompany(): void
+    public function testChangingTheTypeToEndClientRemovesTheTypeBonus(): void
     {
         $id = self::intAt($this->request('POST', '/api/companies', ['name' => 'Acme', 'type' => 'ESN'])[1], 'id');
         self::assertSame(20, $this->score($id));
@@ -56,7 +56,7 @@ final class ScoringApiTest extends ApiTestCase
         [, $body] = $this->request('PATCH', '/api/companies/'.$id, ['type' => 'END_CLIENT']);
 
         self::assertSame(0, self::at($body, 'score'));
-        self::assertStringContainsString('Éliminée : Client final', self::str($body, 'scoreExplanation'));
+        self::assertStringNotContainsString('Éliminée', self::str($body, 'scoreExplanation'));
     }
 
     public function testInteractionUpdatesTheScore(): void

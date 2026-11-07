@@ -45,7 +45,7 @@ Implémenté dans `src/Scoring/`. Une règle = une classe taguée `app.scoring_r
 
 | Règle | Contribution |
 |---|---|
-| `CompanyTypeRule` | ESN / agence web / agence de com **+20** ; client final **éliminatoire**, particulier neutre |
+| `CompanyTypeRule` | ESN / agence web / agence de com **+20** ; client final, particulier et inconnu **0** |
 | `ActivityRule` | type inconnu seulement : NAF cible (62.01Z, 62.02A/B, 62.03Z, 62.09Z, 63.11Z, 63.12Z, 73.11Z) **+15** ; édition de logiciels (58.29A/C) **+5** |
 | `HeadcountRule` | 1-2 **+3** ; 3-5 **+8** ; 6-9, 10-19, 20-49 **+15** ; 50-99 **+8** ; au-delà 0 |
 | `ScopeRule` | zone locale **+10** |

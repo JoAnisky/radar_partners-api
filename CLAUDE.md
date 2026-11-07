@@ -7,7 +7,7 @@
 Outil de prospection pour un développeur freelance fullstack/DevOps (Symfony, Vue/Nuxt, WordPress, Docker/K3s).
 Il repère les **ESN, agences web et agences de communication** qui ont un besoin de renfort, et aide à les contacter au bon moment avec le bon angle.
 
-Clients **exclus** : les clients finaux (PME, commerçants…). L'outil cherche des partenaires durables, pas des projets ponctuels.
+Cible principale : partenaires durables. Les clients finaux (PME, commerçants…) sont désormais prospectés aussi (type `END_CLIENT`, sans bonus de type au score, filtrables dans la liste).
 
 Deux périmètres :
 - **Local (Besançon / Bourgogne-Franche-Comté)** : approche proactive. On part d'un référentiel d'entreprises, qu'on enrichit et qu'on surveille.

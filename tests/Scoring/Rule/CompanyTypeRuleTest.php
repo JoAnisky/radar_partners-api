@@ -16,11 +16,9 @@ final class CompanyTypeRuleTest extends RuleTestCase
         }
     }
 
-    public function testEndClientIsEliminated(): void
+    public function testEndClientScoresNothingAndIsNotEliminated(): void
     {
-        $contributions = (new CompanyTypeRule())->evaluate((new Company('A'))->setType(CompanyType::EndClient), self::context());
-
-        self::assertTrue($contributions[0]->eliminatory);
+        self::assertSame([], (new CompanyTypeRule())->evaluate((new Company('A'))->setType(CompanyType::EndClient), self::context()));
     }
 
     public function testUnknownTypeScoresNothing(): void
