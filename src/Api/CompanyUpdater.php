@@ -135,8 +135,12 @@ final readonly class CompanyUpdater
 
         if (\array_key_exists('nafCode', $payload)) {
             $naf = Payload::nullableString($payload['nafCode'], 'nafCode', 10);
-            if (null !== $naf && 1 !== preg_match('/^\d{2}\.\d{2}[A-Z]$/', $naf = strtoupper($naf))) {
-                throw new UnprocessableEntityHttpException('Le code NAF doit ressembler à 62.01Z.');
+            if (null !== $naf) {
+                $naf = strtoupper(str_replace(['.', ' '], '', $naf));
+                if (1 !== preg_match('/^(\d{2})(\d{2}[A-Z])$/', $naf, $parts)) {
+                    throw new UnprocessableEntityHttpException('Le code NAF doit ressembler à 62.01Z ou 6201Z.');
+                }
+                $naf = $parts[1].'.'.$parts[2];
             }
             $company->setNafCode($naf);
         }

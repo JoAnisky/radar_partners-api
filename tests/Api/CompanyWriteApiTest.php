@@ -180,6 +180,17 @@ final class CompanyWriteApiTest extends ApiTestCase
         self::assertSame(409, $this->request('PATCH', $uri, ['siren' => '111111111'])[0]);
     }
 
+    public function testPatchAcceptsNafCodeWithoutDot(): void
+    {
+        $uri = '/api/companies/'.$this->company('Acme')->getId();
+
+        foreach (['6202A', '62.02a', ' 6202 A '] as $input) {
+            [$status, $body] = $this->request('PATCH', $uri, ['nafCode' => $input]);
+            self::assertSame(200, $status, $input);
+            self::assertSame('62.02A', self::at($body, 'nafCode'), $input);
+        }
+    }
+
     public function testPatchRejectsInvalidIdentityValues(): void
     {
         $uri = '/api/companies/'.$this->company('Acme')->getId();
@@ -190,7 +201,8 @@ final class CompanyWriteApiTest extends ApiTestCase
             ['phone' => '12'],
             ['email' => 'not-an-email'],
             ['siren' => '12345'],
-            ['nafCode' => '6201Z'],
+            ['nafCode' => '6201'],
+            ['nafCode' => '62.0Z'],
             ['postalCode' => '01234567890'],
             ['city' => 42],
         ] as $payload) {
