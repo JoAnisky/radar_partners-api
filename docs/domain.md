@@ -43,5 +43,7 @@ Le modèle découle des limites du tableur de prospection actuel, où une même 
 - `NO_FREELANCE_POLICY` → `status = EXCLUDED`.
 - `JUST_HIRED` / `NO_NEED` → `ON_HOLD` + `recontactAfter` (délai par défaut configurable, à ajuster).
 - `MEETING_SCHEDULED` → `MEETING`.
+- Pas de réponse à une candidature ou un contact : `ON_HOLD` + date de relance (la fiche remonte dans « à relancer » ou si une nouvelle offre arrive). `EXCLUDED` est réservé aux refus nets (score 0, jamais relancée).
+- Rattacher un signal en cochant « J'ai postulé » crée une interaction `WEB_FORM` datée (« Candidature : titre ») avec une prochaine action à un mois.
 - Le statut se déduit de la dernière interaction significative, mais reste modifiable à la main.
 - Un signal `JOB_POSTING` sur une entreprise `ON_HOLD` la fait remonter (le besoin a changé).
