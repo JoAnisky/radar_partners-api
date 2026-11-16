@@ -45,6 +45,7 @@ L'ingestion tourne **toute seule chaque jour à 9h** (Europe/Paris) et se rattra
 | Importer le référentiel de Besançon (API Recherche d'entreprises) | `console app:referential:import --dry-run` puis sans `--dry-run` |
 | Explorer le référentiel sans rien écrire | `console app:referential:search --query=agence --department=25 --headcount=03,11` |
 | Importer le tableur de prospection | `console app:import:prospection chemin/fichier.xlsx --dry-run` |
+| Importer un CSV d'agences | `console app:import:agencies chemin/fichier.csv --dry-run` |
 
 ## Assistant Amelio et modèle local (Ollama)
 

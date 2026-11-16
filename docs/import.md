@@ -18,3 +18,10 @@ Commande `app:import:prospection <fichier.xlsx>` (PhpSpreadsheet) :
 - Une entreprise dont le nom existe déjà est ignorée (rejouable sans doublon) ; `--dry-run` annule la transaction.
 - Cas flous (prénom seul, année seule, date ambiguë, canal inconnu, RDV à vérifier) : rapport en fin de commande, texte conservé dans les notes.
 - Tests avec données fictives uniquement ; le fichier réel reste dans `var/import/` (ignoré par git).
+
+## CSV d'agences (`app:import:agencies`)
+
+`app:import:agencies <fichier.csv> [--dry-run]` : colonnes Agence, Ville, Zone, Priorité, Statut, Date contact, Prochaine action, Interlocuteur, Infos (stack, taille), Notes.
+- Rapprochement avec l'existant par `CompanyNameMatcher` (« Agence Facton » = « Facton »). Une entreprise existante **n'est jamais écrasée** : seuls les champs vides sont complétés (type inconnu, zone, ville, notes). Plusieurs correspondances : ignorée et signalée.
+- Nouvelle agence : `TO_CONTACT`, ville = première ville citée (les autres vont dans les notes), zone selon la colonne Zone, périmètre `LOCAL` sauf Suisse (`NATIONAL`), type déduit des mots de l'agence et de ses infos (web, Symfony, WordPress… → agence web ; com, communication, pub → agence de com ; sinon inconnu). Priorité, infos et prochaine action vont dans les notes (pas de champ dédié, aucun effet sur le score).
+- Date de contact et interlocuteur ne sont pas gérés : signalés si renseignés. Rejouable sans doublon.

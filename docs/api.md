@@ -13,6 +13,7 @@ Liste paginée. Réponse : `{ items, total, page, perPage }` ; chaque item : id,
 | `q` | texte, insensible à la casse et aux accents (nom, ville, SIREN) | |
 | `status` | `TO_CONTACT`, `CONTACTED`, `FOLLOW_UP`, `MEETING`, `PARTNER`, `ON_HOLD`, `EXCLUDED` | |
 | `scope` | `LOCAL`, `NATIONAL` | |
+| `zone` | `FRANCHE_COMTE`, `BOURGOGNE`, `SUISSE_ROMANDE`, `OTHER` | |
 | `type` | `ESN`, `WEB_AGENCY`, `COM_AGENCY`, `END_CLIENT`, `INDIVIDUAL`, `UNKNOWN` | |
 | `due` | `1` : relance dépassée, ou prochaine action échue sur la dernière interaction | |
 | `archived` | `1` : seulement les archivées (sinon exclues) | |
@@ -33,7 +34,7 @@ Crée une entreprise : `name` (obligatoire), `scope` (défaut `NATIONAL`), `type
 
 ### `PATCH /api/companies/{id}`
 
-Modification partielle : seuls les champs présents sont touchés. Champs : `status`, `type`, `scope`, `notes` (`null` pour vider), `recontactAfter` (date ou `null`), `flags` (liste de `MAJUSCULES_`), `archived` (booléen), et l'identité : `name` (obligatoire, unique), `website` (`https://` ajouté si absent), `address`, `postalCode`, `city`, `phone` (normalisé en E.164, `422` si invalide), `email` (minuscules, validé), `siren` (9 chiffres, unique), `nafCode` (`62.01Z` ou `6201Z`, normalisé en `62.01Z`), `headcountRange`. Une chaîne vide ou `null` vide le champ. Champ inconnu ou valeur invalide : `422` ; nom ou SIREN déjà pris par une autre entreprise : `409`. Renvoie la fiche.
+Modification partielle : seuls les champs présents sont touchés. Champs : `status`, `type`, `scope`, `zone` (`null` pour vider), `notes` (`null` pour vider), `recontactAfter` (date ou `null`), `flags` (liste de `MAJUSCULES_`), `archived` (booléen), et l'identité : `name` (obligatoire, unique), `website` (`https://` ajouté si absent), `address`, `postalCode`, `city`, `phone` (normalisé en E.164, `422` si invalide), `email` (minuscules, validé), `siren` (9 chiffres, unique), `nafCode` (`62.01Z` ou `6201Z`, normalisé en `62.01Z`), `headcountRange`. Une chaîne vide ou `null` vide le champ. Champ inconnu ou valeur invalide : `422` ; nom ou SIREN déjà pris par une autre entreprise : `409`. Renvoie la fiche.
 
 Règle : un changement de `status` vers `ON_HOLD` sans `recontactAfter` fixe la date à maintenant + `app.recontact_delay` ; vers un autre statut, la date est effacée.
 

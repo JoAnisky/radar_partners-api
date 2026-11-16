@@ -9,6 +9,7 @@ Le modèle découle des limites du tableur de prospection actuel, où une même 
 - `name`, `website`, `address`, `postalCode`, `city`
 - `phone` (standard, normalisé E.164, nullable), `email` (générique, nullable)
 - `nafCode`, `headcountRange`
+- `zone` : enum `Zone` (`FRANCHE_COMTE`, `BOURGOGNE`, `SUISSE_ROMANDE`, `OTHER`, nullable) ; déduite du département du code postal à son enregistrement si elle est vide (`Zone::fromPostalCode`), modifiable à la main. Sert au filtre « Zone » de la liste, plus fiable que `scope` (un siège parisien avec un établissement local est `LOCAL`).
 - `type` : enum `CompanyType` → `ESN`, `WEB_AGENCY`, `COM_AGENCY`, `END_CLIENT`, `INDIVIDUAL` (particulier, sans effet sur le score), `UNKNOWN`
 - `scope` : enum `Scope` → `LOCAL`, `NATIONAL`
 - `parent` : `?Company` (filiales et agences d'un groupe, ex. bureau local d'un siège ailleurs)
