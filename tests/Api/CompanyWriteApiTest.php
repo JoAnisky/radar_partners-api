@@ -180,6 +180,15 @@ final class CompanyWriteApiTest extends ApiTestCase
         self::assertSame(409, $this->request('PATCH', $uri, ['siren' => '111111111'])[0]);
     }
 
+    public function testPatchChangesZone(): void
+    {
+        $uri = '/api/companies/'.$this->company('Acme')->getId();
+
+        self::assertSame('SUISSE_ROMANDE', self::at($this->request('PATCH', $uri, ['zone' => 'SUISSE_ROMANDE'])[1], 'zone'));
+        self::assertNull(self::at($this->request('PATCH', $uri, ['zone' => null])[1], 'zone'));
+        self::assertSame(422, $this->request('PATCH', $uri, ['zone' => 'MARS'])[0]);
+    }
+
     public function testPatchAcceptsNafCodeWithoutDot(): void
     {
         $uri = '/api/companies/'.$this->company('Acme')->getId();

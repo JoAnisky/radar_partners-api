@@ -6,6 +6,7 @@ use App\Entity\Trait\Timestampable;
 use App\Enum\CompanyType;
 use App\Enum\PipelineStatus;
 use App\Enum\Scope;
+use App\Enum\Zone;
 use App\Repository\CompanyRepository;
 use App\Util\PhoneNormalizer;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -59,6 +60,9 @@ class Company
 
     #[ORM\Column(length: 20, enumType: Scope::class)]
     private Scope $scope = Scope::Local;
+
+    #[ORM\Column(length: 20, nullable: true, enumType: Zone::class)]
+    private ?Zone $zone = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -157,6 +161,19 @@ class Company
     public function setPostalCode(?string $postalCode): static
     {
         $this->postalCode = $postalCode;
+        $this->zone ??= Zone::fromPostalCode($postalCode);
+
+        return $this;
+    }
+
+    public function getZone(): ?Zone
+    {
+        return $this->zone;
+    }
+
+    public function setZone(?Zone $zone): static
+    {
+        $this->zone = $zone;
 
         return $this;
     }

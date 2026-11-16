@@ -41,6 +41,16 @@ final class CompanyApiTest extends ApiTestCase
         self::assertSame(['Shop'], self::names($this->get('/api/companies?type=END_CLIENT')[1]));
     }
 
+    public function testFiltersByZoneAndDerivesItFromThePostalCode(): void
+    {
+        $this->company('Near')->setPostalCode('25000');
+        $this->company('Far')->setPostalCode('75003');
+        $this->em->flush();
+
+        self::assertSame(['Near'], self::names($this->get('/api/companies?zone=FRANCHE_COMTE')[1]));
+        self::assertSame(422, $this->get('/api/companies?zone=NOPE')[0]);
+    }
+
     public function testFiltersByStatus(): void
     {
         $this->company('Todo');

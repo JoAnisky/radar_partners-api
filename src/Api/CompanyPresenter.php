@@ -24,6 +24,7 @@ final class CompanyPresenter
             'headcountRange' => $company->getHeadcountRange(),
             'type' => $company->getType()->value,
             'scope' => $company->getScope()->value,
+            'zone' => $company->getZone()?->value,
             'status' => $company->getStatus()->value,
             'score' => $company->getScore(),
             'flags' => $company->getFlags(),

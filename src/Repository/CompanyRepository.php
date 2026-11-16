@@ -91,6 +91,10 @@ class CompanyRepository extends ServiceEntityRepository
             $qb->andWhere('c.type = :type')->setParameter('type', $query->type);
         }
 
+        if (null !== $query->zone) {
+            $qb->andWhere('c.zone = :zone')->setParameter('zone', $query->zone);
+        }
+
         if (null !== $query->scope) {
             $qb->andWhere('c.scope = :scope')->setParameter('scope', $query->scope);
         }

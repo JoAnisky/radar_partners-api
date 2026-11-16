@@ -6,6 +6,7 @@ use App\Entity\Company;
 use App\Enum\CompanyType;
 use App\Enum\PipelineStatus;
 use App\Enum\Scope;
+use App\Enum\Zone;
 use App\Repository\CompanyRepository;
 use App\Service\PipelineStatusResolver;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 final readonly class CompanyUpdater
 {
     private const FIELDS = [
-        'status', 'type', 'scope', 'notes', 'recontactAfter', 'flags', 'archived',
+        'status', 'type', 'scope', 'zone', 'notes', 'recontactAfter', 'flags', 'archived',
         'name', 'website', 'address', 'postalCode', 'city', 'phone', 'email', 'siren', 'nafCode', 'headcountRange',
     ];
 
@@ -50,6 +51,10 @@ final readonly class CompanyUpdater
 
         if (\array_key_exists('type', $payload)) {
             $company->setType(Payload::enum(CompanyType::class, $payload['type'], 'type'));
+        }
+
+        if (\array_key_exists('zone', $payload)) {
+            $company->setZone(null === $payload['zone'] ? null : Payload::enum(Zone::class, $payload['zone'], 'zone'));
         }
 
         if (\array_key_exists('scope', $payload)) {
